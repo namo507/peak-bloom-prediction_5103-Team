@@ -1,0 +1,461 @@
+---
+title: "Cherry Blossom Competition Solution (R)"
+author: "Team 5103"
+format:
+  html:
+    embed-resources: true
+execute:
+  warning: false
+  message: false
+---
+
+## Goal
+
+This notebook builds a competition-focused ensemble for the next unseen year:
+
+- `Model A`: site-level recency-weighted trend (strong for long local histories).
+- `Model B`: pooled nonlinear GAM using geography + time + all auxiliary datasets.
+- `Ensemble`: inverse-MAE weighted blend from rolling-origin backtesting.
+- `Intervals`: location-wise conformal residual quantiles from backtests.
+
+## Submission preview
+
+```{r}
+preview_file <- "cherry-predictions-final.csv"
+
+infer_target_year <- function() {
+  files <- c("data/kyoto.csv", "data/washingtondc.csv", "data/liestal.csv", "data/vancouver.csv", "data/nyc.csv")
+  years <- c()
+  for (f in files) {
+    if (file.exists(f)) {
+      tmp <- try(read.csv(f, stringsAsFactors = FALSE), silent = TRUE)
+      if (!inherits(tmp, "try-error") && "year" %in% names(tmp)) {
+        years <- c(years, suppressWarnings(as.integer(tmp$year)))
+      }
+    }
+  }
+  years <- years[!is.na(years)]
+  if (length(years) == 0) as.integer(format(Sys.Date(), "%Y")) else max(years) + 1L
+}
+
+doy_to_date <- function(year, doy) {
+  as.Date(strptime(sprintf("%d %03d", as.integer(year), as.integer(doy)), format = "%Y %j"))
+}
+
+preview_year <- infer_target_year()
+cat(sprintf("Preview year: %d\n\n", preview_year))
+
+if (file.exists(preview_file)) {
+  x <- read.csv(preview_file, stringsAsFactors = FALSE)
+  x <- x[order(x$location), ]
+  x$predicted_date <- doy_to_date(preview_year, x$prediction)
+  x$lower_date <- doy_to_date(preview_year, x$lower)
+  x$upper_date <- doy_to_date(preview_year, x$upper)
+  x
+} else if (file.exists("cherry-predictions.csv")) {
+  x <- read.csv("cherry-predictions.csv", stringsAsFactors = FALSE)
+  x <- x[order(x$location), ]
+  x$predicted_date <- doy_to_date(preview_year, x$prediction)
+  x$lower_date <- doy_to_date(preview_year, x$lower)
+  x$upper_date <- doy_to_date(preview_year, x$upper)
+  x
+} else {
+  data.frame(note = "Run this document once to generate submission files.")
+}
+```
+
+```{r}
+#| label: setup
+required_pkgs <- c("tidyverse", "lubridate", "mgcv")
+missing_pkgs <- required_pkgs[!vapply(required_pkgs, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_pkgs) > 0) {
+  install.packages(missing_pkgs)
+}
+
+library(tidyverse)
+library(lubridate)
+library(mgcv)
+
+set.seed(5103)
+options(dplyr.summarise.inform = FALSE)
+```
+
+## Load and unify data
+
+```{r}
+competition_files <- c(
+  "data/kyoto.csv",
+  "data/washingtondc.csv",
+  "data/liestal.csv",
+  "data/vancouver.csv",
+  "data/nyc.csv"
+)
+
+aux_files <- c(
+  "data/japan.csv",
+  "data/meteoswiss.csv",
+  "data/south_korea.csv"
+)
+
+read_bloom_file <- function(path, source) {
+  read_csv(path, show_col_types = FALSE) |>
+    transmute(
+      source = source,
+      location,
+      lat,
+      long,
+      alt,
+      year = as.integer(year),
+      bloom_doy = as.numeric(bloom_doy)
+    )
+}
+
+competition_raw <- map_dfr(competition_files, ~ read_bloom_file(.x, "competition"))
+aux_raw <- map_dfr(aux_files, ~ read_bloom_file(.x, "auxiliary"))
+
+# Extra NYC signal from USA-NPN status observations (site 32789, species 228, Open flowers)
+nyc_npn_status <- read_csv("data/USA-NPN_status_intensity_observations_data.csv", show_col_types = FALSE) |>
+  filter(Site_ID == 32789, Species_ID == 228, Phenophase_ID == 501) |>
+  mutate(
+    Observation_Date = as_date(Observation_Date, format = "%m/%d/%y"),
+    year = year(Observation_Date)
+  ) |>
+  arrange(Observation_Date) |>
+  group_by(year) |>
+  summarize(
+    bloom_doy = first(Day_of_Year[Phenophase_Status == 1]),
+    .groups = "drop"
+  ) |>
+  filter(!is.na(bloom_doy)) |>
+  mutate(source = "npn", location = "newyorkcity",
+         lat = 40.73040, long = -73.99809, alt = 8.5) |>
+  select(source, location, lat, long, alt, year, bloom_doy)
+
+# Also use USA-NPN individual phenometrics (pre-computed first-flower DOY)
+nyc_npn_pheno <- read_csv("data/USA-NPN_individual_phenometrics_data.csv", show_col_types = FALSE) |>
+  filter(Site_ID == 32789, Species_ID == 228, Phenophase_ID == 501) |>
+  group_by(First_Yes_Year) |>
+  summarize(bloom_doy = min(First_Yes_DOY, na.rm = TRUE), .groups = "drop") |>
+  filter(is.finite(bloom_doy)) |>
+  rename(year = First_Yes_Year) |>
+  mutate(source = "npn", location = "newyorkcity",
+         lat = 40.73040, long = -73.99809, alt = 8.5) |>
+  select(source, location, lat, long, alt, year, bloom_doy)
+
+# Merge both NPN sources (status takes priority where years overlap)
+nyc_npn <- nyc_npn_status |>
+  bind_rows(nyc_npn_pheno |>
+              anti_join(nyc_npn_status, by = "year"))
+
+competition <- competition_raw |>
+  bind_rows(nyc_npn |>
+              anti_join(competition_raw, by = c("location", "year")))
+
+all_data <- competition |>
+  bind_rows(aux_raw) |>
+  filter(!is.na(bloom_doy), !is.na(year), year >= 1880) |>
+  mutate(
+    site_id = paste(source, location, sep = "::"),
+    source = factor(source),
+    location = as.character(location)
+  )
+
+competition_sites <- sort(unique(competition_raw$location))
+target_year <- max(competition_raw$year, na.rm = TRUE) + 1
+
+all_data |>
+  count(source, name = "rows")
+```
+
+## Feature engineering
+
+```{r}
+add_features <- function(df, reference_df = NULL) {
+  ref <- if (is.null(reference_df)) df else reference_df
+  site_n <- ref |>
+    count(site_id, name = "site_obs")
+
+  df |>
+    left_join(site_n, by = "site_id") |>
+    mutate(
+      year_c = year - 1950,
+      year_c2 = year_c^2,
+      decade = floor(year / 10) * 10,
+      lat_abs = abs(lat),
+      alt_log1p = log1p(pmax(alt, 0)),
+      site_obs = replace_na(site_obs, 1)
+    )
+}
+```
+
+## Model definitions
+
+```{r}
+predict_local_trend <- function(train_comp, new_comp) {
+  preds <- map_dfr(unique(new_comp$location), function(loc) {
+    tr <- train_comp |>
+      filter(location == loc) |>
+      arrange(year)
+
+    nd <- new_comp |>
+      filter(location == loc)
+
+    n <- nrow(tr)
+
+    if (n >= 4) {
+      w <- exp(seq(-n + 1, 0) / 6)
+      fit <- lm(bloom_doy ~ year + I(year^2), data = tr, weights = w)
+      p <- predict(fit, newdata = nd)
+    } else if (n >= 2) {
+      fit <- lm(bloom_doy ~ year, data = tr)
+      p <- predict(fit, newdata = nd)
+    } else {
+      p <- rep(mean(tr$bloom_doy, na.rm = TRUE), nrow(nd))
+    }
+
+    nd |>
+      mutate(pred_local = as.numeric(p))
+  })
+
+  preds
+}
+
+fit_gam_model <- function(train_all) {
+  mgcv::gam(
+    bloom_doy ~
+      s(year, k = 25, bs = "cr") +
+      s(lat, long, k = 40, bs = "tp") +
+      s(alt_log1p, k = 8, bs = "cr") +
+      s(site_obs, k = 8, bs = "cr") +
+      source,
+    data = train_all,
+    method = "REML"
+  )
+}
+```
+
+## Rolling-origin backtest for weights and interval calibration
+
+```{r}
+backtest_years <- seq(max(1900, min(competition_raw$year) + 20), max(competition_raw$year))
+
+rolling_results <- map_dfr(backtest_years, function(y) {
+  train_comp <- competition |>
+    filter(year < y)
+
+  test_comp <- competition_raw |>
+    filter(year == y)
+
+  if (nrow(test_comp) == 0 || n_distinct(train_comp$location) < length(competition_sites)) {
+    return(tibble())
+  }
+
+  train_all <- all_data |>
+    filter(year < y) |>
+    add_features()
+
+  test_comp_feat <- test_comp |>
+    mutate(source = factor("competition", levels = levels(all_data$source)),
+           site_id = paste(source, location, sep = "::")) |>
+    add_features(reference_df = train_all)
+
+  local_pred <- predict_local_trend(train_comp, test_comp_feat)
+
+  gam_fit <- fit_gam_model(train_all)
+  gam_pred <- predict(gam_fit, newdata = test_comp_feat)
+
+  out <- test_comp_feat |>
+    select(location, year, bloom_doy) |>
+    left_join(local_pred |>
+                select(location, year, pred_local),
+              by = c("location", "year")) |>
+    mutate(pred_gam = as.numeric(gam_pred))
+
+  out
+})
+
+mae_local <- mean(abs(rolling_results$bloom_doy - rolling_results$pred_local), na.rm = TRUE)
+mae_gam <- mean(abs(rolling_results$bloom_doy - rolling_results$pred_gam), na.rm = TRUE)
+
+w_local <- (1 / mae_local) / ((1 / mae_local) + (1 / mae_gam))
+w_gam <- 1 - w_local
+
+rolling_results <- rolling_results |>
+  mutate(pred_ensemble = w_local * pred_local + w_gam * pred_gam,
+         abs_err = abs(bloom_doy - pred_ensemble))
+
+site_q90 <- rolling_results |>
+  group_by(location) |>
+  summarize(q90 = quantile(abs_err, probs = 0.90, na.rm = TRUE, type = 8), .groups = "drop")
+
+global_q90 <- quantile(rolling_results$abs_err, probs = 0.90, na.rm = TRUE, type = 8)
+
+tibble(model = c("local", "gam", "ensemble"),
+       mae = c(mae_local,
+               mae_gam,
+               mean(abs(rolling_results$bloom_doy - rolling_results$pred_ensemble), na.rm = TRUE)))
+```
+
+## Final fit and next-year prediction
+
+```{r}
+train_all <- add_features(all_data)
+train_comp <- competition
+
+newdata <- competition_raw |>
+  group_by(location) |>
+  slice_max(year, n = 1, with_ties = FALSE) |>
+  ungroup() |>
+  transmute(
+    source = factor("competition", levels = levels(all_data$source)),
+    location,
+    lat,
+    long,
+    alt,
+    year = target_year,
+    bloom_doy = NA_real_,
+    site_id = paste(source, location, sep = "::")
+  ) |>
+  add_features(reference_df = train_all)
+
+local_pred <- predict_local_trend(train_comp, newdata)
+gam_fit <- fit_gam_model(train_all)
+
+gam_pred <- predict(gam_fit, newdata = newdata)
+
+final_pred <- newdata |>
+  select(location, year) |>
+  left_join(local_pred |>
+              select(location, year, pred_local),
+            by = c("location", "year")) |>
+  mutate(
+    pred_gam = as.numeric(gam_pred),
+    prediction = w_local * pred_local + w_gam * pred_gam
+  ) |>
+  left_join(site_q90, by = "location") |>
+  mutate(
+    q90 = replace_na(q90, as.numeric(global_q90)),
+    lower = prediction - q90,
+    upper = prediction + q90,
+    prediction = round(prediction),
+    lower = floor(lower),
+    upper = ceiling(upper),
+    prediction = pmin(pmax(prediction, 1), 366),
+    lower = pmin(pmax(lower, 1), 366),
+    upper = pmin(pmax(upper, 1), 366)
+  ) |>
+  arrange(location)
+
+final_pred
+```
+
+## Convert day-of-year to date and write submission file
+
+```{r}
+doy_to_date <- function(year, doy) {
+  as_date(strptime(sprintf("%d %03d", year, doy), format = "%Y %j"))
+}
+
+submission <- final_pred |>
+  mutate(
+    predicted_date = doy_to_date(year, prediction),
+    lower_date = doy_to_date(year, lower),
+    upper_date = doy_to_date(year, upper)
+  ) |>
+  select(location, prediction, lower, upper, predicted_date, lower_date, upper_date)
+
+submission
+```
+
+```{r}
+# Official competition-format CSV
+submission |>
+  select(location, prediction, lower, upper) |>
+  write_csv("cherry-predictions.csv")
+```
+
+## Compare R vs Python and auto-recommend final submission
+
+```{r}
+python_file <- "cherry-predictions-python.csv"
+
+if (file.exists(python_file)) {
+  r_sub <- submission |>
+    select(location, prediction, lower, upper) |>
+    rename(
+      prediction_r = prediction,
+      lower_r = lower,
+      upper_r = upper
+    )
+
+  py_sub <- read_csv(python_file, show_col_types = FALSE) |>
+    select(location, prediction, lower, upper) |>
+    rename(
+      prediction_py = prediction,
+      lower_py = lower,
+      upper_py = upper
+    )
+
+  comparison <- r_sub |>
+    inner_join(py_sub, by = "location") |>
+    mutate(
+      point_gap = abs(prediction_r - prediction_py),
+      lower_gap = abs(lower_r - lower_py),
+      upper_gap = abs(upper_r - upper_py)
+    ) |>
+    arrange(desc(point_gap), location)
+
+  comparison
+
+  avg_gap <- mean(comparison$point_gap, na.rm = TRUE)
+
+  # Rule:
+  # - If methods broadly agree (avg gap <= 4 days), blend points AND average bounds.
+  #   Using averaged bounds (not min/max) keeps intervals tight for the tiebreaker
+  #   (sum of squared interval widths).
+  # - Otherwise default to R model (its intervals are calibrated in this report).
+  final_submission <- if (avg_gap <= 4) {
+    comparison |>
+      transmute(
+        location,
+        prediction = round((prediction_r + prediction_py) / 2),
+        lower = floor((lower_r + lower_py) / 2),
+        upper = ceiling((upper_r + upper_py) / 2)
+      )
+  } else {
+    r_sub |>
+      transmute(
+        location,
+        prediction = prediction_r,
+        lower = lower_r,
+        upper = upper_r
+      )
+  }
+
+  final_submission <- final_submission |>
+    mutate(
+      prediction = pmin(pmax(prediction, 1), 366),
+      lower = pmin(pmax(lower, 1), 366),
+      upper = pmin(pmax(upper, 1), 366)
+    ) |>
+    arrange(location)
+
+  write_csv(final_submission, "cherry-predictions-final.csv")
+
+  list(
+    recommendation = if (avg_gap <= 4) {
+      "Use blended R+Python submission"
+    } else {
+      "Use R submission"
+    },
+    mean_point_gap_days = round(avg_gap, 2)
+  )
+
+  final_submission
+} else {
+  message("Python submission file not found; defaulting to R submission.")
+  submission |>
+    select(location, prediction, lower, upper) |>
+    write_csv("cherry-predictions-final.csv")
+}
+```
