@@ -1,7 +1,6 @@
 ---
 title: "Cherry Blossom Peak Bloom Prediction 2026"
-subtitle: "Methodology, Data Analysis & Final Predictions · Team 5103"
-author: "Team 5103 — University of Maryland"
+subtitle: "Team 5103 — University of Maryland"
 date: "February 2026"
 format:
   revealjs:
@@ -12,8 +11,7 @@ format:
     width: 1050
     height: 700
     transition: slide
-    logo: ""
-    footer: "Team 5103 · Cherry Blossom Peak Bloom Prediction 2026"
+    footer: "Team 5103 · University of Maryland · Cherry Blossom Peak Bloom Prediction 2026"
 execute:
   warning: false
   message: false
@@ -30,78 +28,13 @@ library(knitr)
 set.seed(5103)
 options(dplyr.summarise.inform = FALSE)
 
-# ── Helper ──
 doy_to_date <- function(year, doy) {
   as.Date(strptime(sprintf("%d %03d", year, doy), format = "%Y %j"))
 }
-```
 
-## Agenda {.smaller}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-1. Competition Context
-2. Data Sources & Enrichment
-3. Exploratory Data Analysis
-4. Feature Engineering
-5. Model A — Local Trend
-:::
-
-::: {.column width="50%"}
-6. Model B — Pooled Nonlinear Learner
-7. Backtesting & Ensemble Blending
-8. Prediction Intervals
-9. Cross-Language Robustness
-10. Final 2026 Predictions
-:::
-
-::::
-
----
-
-## Competition Context {.smaller}
-
-| Aspect | Detail |
-|---|---|
-| **Organizer** | George Mason University, Dept. of Statistics |
-| **Task** | Predict peak bloom DOY for **5 sites** in 2026 |
-| **Point scoring** | Sum of absolute errors across all 5 sites |
-| **Interval scoring** | Coverage count (tiebreak: sum of squared widths) |
-| **Deadline** | February 28, 2026 (AoE) |
-
-::: {.callout-note}
-## Sites
-Kyoto (Japan) · Washington D.C. (USA) · Liestal-Weideli (Switzerland) · Vancouver BC (Canada) · New York City (USA)
-:::
-
----
-
-## Site Characteristics {.smaller}
-
-```{r}
-tibble(
-  Site       = c("Kyoto", "Washington DC", "Liestal", "Vancouver", "New York City"),
-  Latitude   = c(35.01, 38.89, 47.48, 49.22, 40.73),
-  Longitude  = c(135.68, -77.04, 7.73, -123.16, -74.00),
-  `Alt (m)`  = c(44, 0, 350, 24, 8.5),
-  `Record span` = c("812 – 2025", "1921 – 2025", "1895 – 2025", "2022 – 2025", "2019 – 2025"),
-  Species    = c("P. jamasakura", "P. × yedoensis", "P. avium",
-                 "P. × yedoensis 'Akebono'", "P. × yedoensis")
-) |>
-  kable(align = "lrrrlr")
-```
-
----
-
-## Data Sources Overview {.smaller}
-
-```{r}
-#| label: load-data
-competition_files <- c(
-  "data/kyoto.csv", "data/washingtondc.csv", "data/liestal.csv",
-  "data/vancouver.csv", "data/nyc.csv"
-)
+# ── Load all data ──
+competition_files <- c("data/kyoto.csv", "data/washingtondc.csv",
+                       "data/liestal.csv", "data/vancouver.csv", "data/nyc.csv")
 aux_files <- c("data/japan.csv", "data/meteoswiss.csv", "data/south_korea.csv")
 
 read_bloom_file <- function(path, source) {
@@ -112,24 +45,8 @@ read_bloom_file <- function(path, source) {
 
 competition_raw <- map_dfr(competition_files, ~ read_bloom_file(.x, "competition"))
 aux_raw         <- map_dfr(aux_files, ~ read_bloom_file(.x, "auxiliary"))
-```
 
-```{r}
-tibble(
-  Category = c("Competition core", "Auxiliary (Japan, MeteoSwiss, S. Korea)", "USA-NPN (NYC enrichment)"),
-  Files    = c("kyoto, washingtondc, liestal, vancouver, nyc", "japan, meteoswiss, south_korea",
-               "status-intensity + individual phenometrics"),
-  Rows     = c(nrow(competition_raw), nrow(aux_raw), "~4 extra NYC bloom-years")
-) |>
-  kable()
-```
-
----
-
-## NYC Data Enrichment (USA-NPN) {.smaller}
-
-```{r}
-#| label: npn-load
+# NPN enrichment
 nyc_npn_status <- read_csv("data/USA-NPN_status_intensity_observations_data.csv",
                            show_col_types = FALSE) |>
   filter(Site_ID == 32789, Species_ID == 228, Phenophase_ID == 501) |>
@@ -140,7 +57,8 @@ nyc_npn_status <- read_csv("data/USA-NPN_status_intensity_observations_data.csv"
   summarize(bloom_doy = first(Day_of_Year[Phenophase_Status == 1]), .groups = "drop") |>
   filter(!is.na(bloom_doy)) |>
   mutate(source = "npn", location = "newyorkcity",
-         lat = 40.73040, long = -73.99809, alt = 8.5)
+         lat = 40.73040, long = -73.99809, alt = 8.5) |>
+  select(source, location, lat, long, alt, year, bloom_doy)
 
 nyc_npn_pheno <- read_csv("data/USA-NPN_individual_phenometrics_data.csv",
                           show_col_types = FALSE) |>
@@ -150,14 +68,11 @@ nyc_npn_pheno <- read_csv("data/USA-NPN_individual_phenometrics_data.csv",
   filter(is.finite(bloom_doy)) |>
   rename(year = First_Yes_Year) |>
   mutate(source = "npn", location = "newyorkcity",
-         lat = 40.73040, long = -73.99809, alt = 8.5)
+         lat = 40.73040, long = -73.99809, alt = 8.5) |>
+  select(source, location, lat, long, alt, year, bloom_doy)
 
-nyc_npn <- nyc_npn_status |>
-  select(source, location, lat, long, alt, year, bloom_doy) |>
-  bind_rows(nyc_npn_pheno |>
-              select(source, location, lat, long, alt, year, bloom_doy) |>
-              anti_join(nyc_npn_status, by = "year"))
-
+nyc_npn <- bind_rows(nyc_npn_status,
+                     nyc_npn_pheno |> anti_join(nyc_npn_status, by = "year"))
 existing_nyc <- competition_raw |> filter(location == "newyorkcity") |> pull(year)
 nyc_extra <- nyc_npn |> filter(!year %in% existing_nyc)
 
@@ -166,78 +81,11 @@ all_data <- bind_rows(competition, aux_raw) |>
   filter(!is.na(bloom_doy), !is.na(year), year >= 1880) |>
   mutate(site_id = paste(source, location, sep = "::"),
          source = factor(source), location = as.character(location))
-```
 
-- **Site 32789** (Washington Square Park), Species 228, Phenophase 501
-- Status-intensity: first `Phenophase_Status == 1` per year
-- Phenometrics: `min(First_Yes_DOY)` per year
-- Merge rule: status takes priority; phenometrics fills gaps
-- **Result:** `r nrow(nyc_extra)` extra NYC bloom years added
+competition_sites <- sort(unique(competition_raw$location))
+target_year <- max(competition_raw$year, na.rm = TRUE) + 1
 
----
-
-## EDA: Long-Term Trend
-
-```{r}
-#| fig-width: 10
-#| fig-height: 5
-competition_raw |>
-  filter(year >= 1880) |>
-  ggplot(aes(year, bloom_doy, color = location)) +
-  geom_point(alpha = 0.5, size = 1.2) +
-  geom_smooth(method = "loess", span = 0.4, se = FALSE, linewidth = 0.9) +
-  facet_wrap(~location, scales = "free_x") +
-  labs(title = "Peak bloom is shifting earlier over time",
-       x = "Year", y = "Peak bloom (DOY)") +
-  theme_minimal(base_size = 13) +
-  theme(legend.position = "none",
-        strip.text = element_text(face = "bold"))
-```
-
----
-
-## EDA: Bloom Distribution by Site
-
-```{r}
-#| fig-width: 10
-#| fig-height: 5
-competition_raw |>
-  filter(year >= 1880) |>
-  ggplot(aes(x = reorder(location, bloom_doy, FUN = median),
-             y = bloom_doy, fill = location)) +
-  geom_boxplot(alpha = 0.7, show.legend = FALSE) +
-  coord_flip() +
-  labs(title = "Bloom-day distribution across competition sites",
-       x = NULL, y = "Peak bloom (DOY)") +
-  theme_minimal(base_size = 14)
-```
-
----
-
-## EDA: Recent Decade Acceleration {.smaller}
-
-```{r}
-#| fig-width: 10
-#| fig-height: 4.5
-competition_raw |>
-  filter(year >= 1950, location %in% c("kyoto", "washingtondc", "liestal")) |>
-  mutate(decade = paste0(floor(year / 10) * 10, "s")) |>
-  ggplot(aes(decade, bloom_doy, fill = location)) +
-  geom_boxplot(alpha = 0.65, position = "dodge") +
-  labs(title = "Bloom timing by decade (long-record sites)",
-       x = "Decade", y = "Peak bloom (DOY)") +
-  theme_minimal(base_size = 13) +
-  theme(legend.position = "bottom")
-```
-
-Over the last two decades, median bloom at all three long-record sites is the **earliest on record**.
-
----
-
-## Feature Engineering {.smaller}
-
-```{r}
-#| label: features
+# ── Feature engineering ──
 add_features <- function(df, reference_df = NULL) {
   ref <- if (is.null(reference_df)) df else reference_df
   site_n <- ref |> count(site_id, name = "site_obs")
@@ -248,79 +96,8 @@ add_features <- function(df, reference_df = NULL) {
            lat_abs = abs(lat), alt_log1p = log1p(pmax(alt, 0)),
            site_obs = replace_na(site_obs, 1))
 }
-```
 
-| Feature | Formula / Description | Ecological rationale |
-|---|---|---|
-| `year_c` | `year − 1950` | Centers the time axis |
-| `year_c²` | `(year − 1950)²` | Captures trend acceleration |
-| `lat`, `long` | Raw coordinates | Spatial climate gradients |
-| `alt_log1p` | `log(1 + max(alt, 0))` | Diminishing altitude effect |
-| `site_obs` | Count of records per site | Data-reliability proxy |
-| `source` | competition / auxiliary / npn | Data-provenance indicator |
-
----
-
-## Model A: Local Recency-Weighted Trend {.smaller}
-
-:::: {.columns}
-
-::: {.column width="55%"}
-**Approach:**
-
-- Per-site quadratic regression:
-  `bloom_doy ~ year + year²`
-- Exponential decay weights:
-  $w_i = e^{(i - n)/6}$ (half-life ≈ 6 yr)
-- Recent years dominate while long history provides curvature
-
-**Fallback rules:**
-
-- ≥ 4 obs → weighted quadratic
-- 2–3 obs → unweighted linear
-- 1 obs → site mean
-:::
-
-::: {.column width="45%"}
-**Strengths:**
-
-- Captures site-specific momentum
-- Adapts to recent bloom acceleration
-
-**Weaknesses:**
-
-- Cannot leverage cross-site info
-- Poor for sparse sites (Vancouver, NYC)
-:::
-
-::::
-
----
-
-## Model B: Pooled Nonlinear Learner {.smaller}
-
-**R pipeline — Generalized Additive Model (GAM):**
-
-$$\text{bloom\_doy} \sim s(\text{year}, k{=}25) + s(\text{lat}, \text{long}, k{=}40) + s(\text{alt}, k{=}8) + s(\text{site\_obs}, k{=}8) + \text{source}$$
-
-- Estimation method: REML · Trained on **all ~14 K+ records** (competition + auxiliary + NPN)
-
-**Python pipeline — Gradient Boosting Regressor (GBR):**
-
-- Huber loss, 700 estimators, learning rate = 0.02, max depth = 3
-- Same feature set; `OneHotEncoder` for source, `MedianImputer` for numerics
-
-**Key advantage:** Learns transferable spatial-temporal structure — sparse sites borrow strength from thousands of auxiliary records.
-
----
-
-## Rolling-Origin Backtesting {.smaller}
-
-```{r}
-#| label: backtest
-#| cache: true
-competition_sites <- sort(unique(competition_raw$location))
-
+# ── Models ──
 predict_local_trend <- function(train_comp, new_comp) {
   map_dfr(unique(new_comp$location), function(loc) {
     tr <- train_comp |> filter(location == loc) |> arrange(year)
@@ -331,11 +108,8 @@ predict_local_trend <- function(train_comp, new_comp) {
       fit <- lm(bloom_doy ~ year + I(year^2), data = tr, weights = w)
       p <- predict(fit, newdata = nd)
     } else if (n >= 2) {
-      fit <- lm(bloom_doy ~ year, data = tr)
-      p <- predict(fit, newdata = nd)
-    } else {
-      p <- rep(mean(tr$bloom_doy, na.rm = TRUE), nrow(nd))
-    }
+      fit <- lm(bloom_doy ~ year, data = tr); p <- predict(fit, newdata = nd)
+    } else { p <- rep(mean(tr$bloom_doy, na.rm = TRUE), nrow(nd)) }
     nd |> mutate(pred_local = as.numeric(p))
   })
 }
@@ -348,6 +122,7 @@ fit_gam_model <- function(train_all) {
              data = train_all, method = "REML")
 }
 
+# ── Rolling backtest ──
 backtest_years <- seq(max(1900, min(competition_raw$year) + 20),
                       max(competition_raw$year))
 
@@ -379,149 +154,20 @@ w_gam     <- 1 - w_local
 rolling_results <- rolling_results |>
   mutate(pred_ensemble = w_local * pred_local + w_gam * pred_gam,
          abs_err = abs(bloom_doy - pred_ensemble))
-
 mae_ens <- mean(rolling_results$abs_err, na.rm = TRUE)
 
 site_q90   <- rolling_results |>
   group_by(location) |>
   summarize(q90 = quantile(abs_err, 0.90, na.rm = TRUE, type = 8), .groups = "drop")
 global_q90 <- quantile(rolling_results$abs_err, 0.90, na.rm = TRUE, type = 8)
-```
 
-**Procedure:** For each year *y* from `r min(backtest_years)` to `r max(backtest_years)`:
-
-1. Train on all data with `year < y`
-2. Predict competition sites observed at year *y*
-3. Record absolute errors for Model A & Model B
-
-→ Ensures **no future leakage**.
-→ Provides honest MAE estimates and residuals for interval calibration.
-
----
-
-## Ensemble Blending — Quantitative Results {.smaller}
-
-**Inverse-MAE weighting:**
-
-$$w_A = \frac{1 / \text{MAE}_A}{1 / \text{MAE}_A + 1 / \text{MAE}_B}, \quad w_B = 1 - w_A$$
-
-```{r}
-tibble(
-  Model = c("Local (Model A)", "GAM (Model B)", "**Ensemble**"),
-  `MAE (days)` = c(round(mae_local, 2), round(mae_gam, 2), round(mae_ens, 2)),
-  Weight = c(paste0(round(w_local * 100, 1), "%"),
-             paste0(round(w_gam * 100, 1), "%"), "—")
-) |>
-  kable(align = "lrr")
-```
-
-<br>
-
-$$\hat{y} = `r round(w_local, 3)` \times \hat{y}_{\text{local}} + `r round(w_gam, 3)` \times \hat{y}_{\text{GAM}}$$
-
-The ensemble outperforms both individual models on held-out years.
-
----
-
-## Backtest Residual Analysis
-
-```{r}
-#| fig-width: 10
-#| fig-height: 4.5
-rolling_results |>
-  ggplot(aes(x = reorder(location, abs_err, FUN = median),
-             y = abs_err, fill = location)) +
-  geom_boxplot(alpha = 0.7, show.legend = FALSE) +
-  geom_hline(yintercept = as.numeric(global_q90), linetype = "dashed",
-             color = "firebrick", linewidth = 0.6) +
-  annotate("text", x = 0.5, y = as.numeric(global_q90) + 0.8,
-           label = paste0("Global q90 = ", round(global_q90, 1), " d"),
-           hjust = 0, color = "firebrick", size = 3.5) +
-  coord_flip() +
-  labs(title = "Ensemble absolute errors from rolling backtest",
-       x = NULL, y = "Absolute error (days)") +
-  theme_minimal(base_size = 13)
-```
-
----
-
-## Prediction Intervals {.smaller}
-
-:::: {.columns}
-
-::: {.column width="55%"}
-**Split-conformal calibration:**
-
-- Half-width = 90th percentile of backtest |residuals| per location
-- Interval: $[\hat{y} - q_{90},\ \hat{y} + q_{90}]$
-- Fallback to global $q_{90}$ for unseen sites
-- Clipped to valid range [1, 366]
-:::
-
-::: {.column width="45%"}
-```{r}
-site_q90 |>
-  mutate(q90 = round(q90, 1),
-         `Width (days)` = round(2 * q90, 1)) |>
-  rename(Location = location, `Half-width` = q90) |>
-  kable(align = "lrr")
-```
-:::
-
-::::
-
-<br>
-
-**Design goal:** ≥ 90% empirical coverage while minimizing $\sum(\text{width}^2)$ (competition tiebreaker).
-
----
-
-## Cross-Language Robustness Check {.smaller}
-
-Two **fully independent** pipelines:
-
-| Pipeline | Model B | Output |
-|---|---|---|
-| R (primary) | GAM (REML) | `cherry-predictions.csv` |
-| Python | GBR (Huber, 700 trees) | `cherry-predictions-python.csv` |
-
-```{r}
-r_sub  <- read_csv("cherry-predictions.csv", show_col_types = FALSE) |>
-  rename(pred_R = prediction, lower_R = lower, upper_R = upper)
-py_sub <- read_csv("cherry-predictions-python.csv", show_col_types = FALSE) |>
-  rename(pred_Py = prediction, lower_Py = lower, upper_Py = upper)
-
-cmp <- inner_join(r_sub, py_sub, by = "location") |>
-  mutate(gap = abs(pred_R - pred_Py))
-
-avg_gap <- mean(cmp$gap)
-```
-
-```{r}
-cmp |>
-  select(location, pred_R, pred_Py, gap) |>
-  rename(Location = location, `R pred` = pred_R, `Python pred` = pred_Py,
-         `|Gap|` = gap) |>
-  kable(align = "lrrr")
-```
-
-Mean point gap = **`r round(avg_gap, 1)` days** (≤ 4 → blended submission used).
-
----
-
-## Final 2026 Predictions — R Pipeline {.smaller}
-
-```{r}
-#| label: final-pred
-target_year <- max(competition_raw$year, na.rm = TRUE) + 1
+# ── Final prediction ──
 train_all <- add_features(all_data)
-
 newdata <- competition_raw |>
   group_by(location) |> slice_max(year, n = 1, with_ties = FALSE) |> ungroup() |>
   transmute(source = factor("competition", levels = levels(all_data$source)),
             location, lat, long, alt, year = target_year,
-            bloom_doy = NA_real_,
-            site_id = paste(source, location, sep = "::")) |>
+            bloom_doy = NA_real_, site_id = paste(source, location, sep = "::")) |>
   add_features(reference_df = train_all)
 
 local_pred <- predict_local_trend(competition, newdata)
@@ -530,64 +176,219 @@ gam_pred   <- predict(gam_fit, newdata = newdata)
 
 final_pred <- newdata |>
   select(location, year) |>
-  left_join(local_pred |> select(location, year, pred_local),
-            by = c("location", "year")) |>
-  mutate(pred_gam   = as.numeric(gam_pred),
+  left_join(local_pred |> select(location, year, pred_local), by = c("location", "year")) |>
+  mutate(pred_gam = as.numeric(gam_pred),
          prediction = round(w_local * pred_local + w_gam * pred_gam)) |>
   left_join(site_q90, by = "location") |>
-  mutate(q90   = replace_na(q90, as.numeric(global_q90)),
+  mutate(q90 = replace_na(q90, as.numeric(global_q90)),
          lower = floor(w_local * pred_local + w_gam * pred_gam - q90),
          upper = ceiling(w_local * pred_local + w_gam * pred_gam + q90)) |>
   mutate(across(c(prediction, lower, upper), ~ pmin(pmax(.x, 1), 366))) |>
   arrange(location)
+
+final_sub <- read_csv("cherry-predictions-final.csv", show_col_types = FALSE)
+ssw <- sum((final_sub$upper - final_sub$lower)^2)
+
+r_sub  <- read_csv("cherry-predictions.csv", show_col_types = FALSE) |>
+  rename(pred_R = prediction)
+py_sub <- read_csv("cherry-predictions-python.csv", show_col_types = FALSE) |>
+  rename(pred_Py = prediction)
+cmp <- inner_join(r_sub, py_sub |> select(location, pred_Py), by = "location") |>
+  mutate(gap = abs(pred_R - pred_Py))
+avg_gap <- mean(cmp$gap)
 ```
 
+## Datasets Overview {.smaller}
+
+:::: {.columns}
+
+::: {.column width="55%"}
+
+**Competition datasets** — bloom DOY for 5 target sites:
+
+| Dataset | Location | Records | Span |
+|---|---|---:|---|
+| `kyoto.csv` | Kyoto, Japan | 837 | 812 – 2025 |
+| `washingtondc.csv` | Washington DC | 106 | 1921 – 2025 |
+| `liestal.csv` | Liestal, Switzerland | 132 | 1895 – 2025 |
+| `vancouver.csv` | Vancouver, Canada | 4 | 2022 – 2025 |
+| `nyc.csv` | New York City | 3 | 2019 – 2025 |
+
+**Auxiliary datasets** — broaden geographic & temporal coverage:
+
+| Dataset | Records |
+|---|---:|
+| `japan.csv` (regional bloom dates) | 6,573 |
+| `meteoswiss.csv` (Swiss phenology) | 6,642 |
+| `south_korea.csv` | 994 |
+
+:::
+
+::: {.column width="45%"}
+
+**USA-NPN enrichment (NYC):**
+
+- Site 32789 (Washington Square Park)
+- Species 228 (*Prunus × yedoensis*)
+- Phenophase 501 (Open flowers)
+- `r nrow(nyc_extra)` extra bloom-year records added
+
+**Total training pool:** ~`r format(nrow(all_data), big.mark = ",")` rows
+
 ```{r}
-final_pred |>
-  transmute(Location = location,
-            `Prediction (DOY)` = prediction,
-            Lower = lower, Upper = upper,
-            `Predicted date` = doy_to_date(target_year, prediction),
-            `Interval` = paste0(
-              format(doy_to_date(target_year, lower), "%b %d"), " – ",
-              format(doy_to_date(target_year, upper), "%b %d"))) |>
-  kable(align = "lrrrlr")
+#| fig-width: 5
+#| fig-height: 3.2
+all_data |>
+  count(source) |>
+  ggplot(aes(reorder(source, -n), n, fill = source)) +
+  geom_col(show.legend = FALSE, alpha = 0.8) +
+  geom_text(aes(label = format(n, big.mark = ",")), vjust = -0.3, size = 3.5) +
+  labs(x = NULL, y = "Records") +
+  theme_minimal(base_size = 11) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15)))
 ```
+
+:::
+
+::::
 
 ---
 
-## Final 2026 Predictions — Blended Submission {.smaller}
+## Models & Methodology {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Model A — Local Trend** (per site)
+
+- Recency-weighted quadratic: `bloom_doy ~ year + year²`
+- Weights: $w_i = e^{(i-n)/6}$, half-life ≈ 6 yr
+- Fallback: linear (2–3 obs) or mean (1 obs)
+- Captures site-specific momentum
+
+**Model B — Pooled GAM** (all sites jointly)
+
+$$\text{DOY} \sim s(\text{year}) + s(\text{lat}, \text{long}) + s(\text{alt}) + s(\text{site\_obs}) + \text{source}$$
+
+- REML estimation on **`r format(nrow(all_data), big.mark=",")`** records
+- Python check: GBR (Huber, 700 trees, lr = 0.02)
+:::
+
+::: {.column width="50%"}
+
+**Ensemble blending** (data-driven)
+
+- Rolling-origin backtest (`r min(backtest_years)` – `r max(backtest_years)`)
+- Inverse-MAE weights from out-of-sample errors:
+
+$$w_A = \tfrac{1/\text{MAE}_A}{1/\text{MAE}_A + 1/\text{MAE}_B}$$
+
+| Model | Backtest MAE |
+|---|---:|
+| Local (A) | `r round(mae_local, 2)` days |
+| GAM (B) | `r round(mae_gam, 2)` days |
+| **Ensemble** | **`r round(mae_ens, 2)` days** |
+
+**Prediction intervals** — split-conformal: 90th-percentile of backtest |residuals| per location → half-width of interval
+
+:::
+
+::::
+
+---
+
+## Backtest Performance & EDA {.smaller}
+
+:::: {.columns}
+
+::: {.column width="50%"}
 
 ```{r}
-final_sub <- read_csv("cherry-predictions-final.csv", show_col_types = FALSE)
+#| fig-width: 5
+#| fig-height: 4
+competition_raw |>
+  filter(year >= 1880) |>
+  ggplot(aes(year, bloom_doy, color = location)) +
+  geom_point(alpha = 0.4, size = 0.9) +
+  geom_smooth(method = "loess", span = 0.4, se = FALSE, linewidth = 0.7) +
+  facet_wrap(~location, scales = "free_x", ncol = 1) +
+  labs(title = "Bloom shifts earlier over time",
+       x = "Year", y = "DOY") +
+  theme_minimal(base_size = 9) +
+  theme(legend.position = "none", strip.text = element_text(face = "bold"))
+```
 
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+rolling_results |>
+  ggplot(aes(x = reorder(location, abs_err, FUN = median),
+             y = abs_err, fill = location)) +
+  geom_boxplot(alpha = 0.7, show.legend = FALSE) +
+  geom_hline(yintercept = as.numeric(global_q90), linetype = "dashed",
+             color = "firebrick", linewidth = 0.5) +
+  annotate("text", x = 0.6, y = as.numeric(global_q90) + 0.6,
+           label = paste0("q90 = ", round(global_q90, 1), " d"),
+           hjust = 0, color = "firebrick", size = 3) +
+  coord_flip() +
+  labs(title = "Ensemble backtest errors by site",
+       x = NULL, y = "Absolute error (days)") +
+  theme_minimal(base_size = 9)
+```
+
+:::
+
+::::
+
+- All 5 sites show a **downward bloom-DOY trend** — climate warming signal
+- Ensemble achieves **`r round(mae_ens, 1)`-day MAE** on rolling held-out years
+- R and Python pipelines agree within **`r round(avg_gap, 1)` days** on average → blended submission
+
+---
+
+## Final 2026 Predictions {.smaller}
+
+:::: {.columns}
+
+::: {.column width="55%"}
+
+```{r}
 final_sub |>
   mutate(
-    `Predicted date` = doy_to_date(target_year, prediction),
+    Date = format(doy_to_date(target_year, prediction), "%b %d"),
     `Interval` = paste0(
       format(doy_to_date(target_year, lower), "%b %d"), " – ",
       format(doy_to_date(target_year, upper), "%b %d")),
     Width = upper - lower
   ) |>
-  rename(Location = location, DOY = prediction, Lower = lower, Upper = upper) |>
-  kable(align = "lrrrllr")
-```
-
-```{r}
-ssw <- sum((final_sub$upper - final_sub$lower)^2)
+  rename(Location = location, DOY = prediction) |>
+  select(Location, DOY, Date, Interval, Width) |>
+  kable(align = "lrlrr")
 ```
 
 <br>
 
-**Sum of squared interval widths (tiebreaker):** `r ssw`
+**Sum of squared interval widths:** `r ssw`
 
----
+| Metric | Value |
+|---|---:|
+| Ensemble backtest MAE | `r round(mae_ens, 2)` days |
+| R vs Python mean gap | `r round(avg_gap, 1)` days |
+| Local weight ($w_A$) | `r round(w_local * 100, 1)`% |
+| GAM weight ($w_B$) | `r round(w_gam * 100, 1)`% |
 
-## Predictions Visualized
+:::
+
+::: {.column width="45%"}
 
 ```{r}
-#| fig-width: 10
-#| fig-height: 5
+#| fig-width: 5
+#| fig-height: 4.5
 final_sub |>
   mutate(date_pred  = doy_to_date(target_year, prediction),
          date_lower = doy_to_date(target_year, lower),
@@ -595,78 +396,36 @@ final_sub |>
          location   = reorder(location, prediction)) |>
   ggplot(aes(y = location)) +
   geom_segment(aes(x = date_lower, xend = date_upper, yend = location),
-               linewidth = 3, color = "#F2A6B6", alpha = 0.7) +
-  geom_point(aes(x = date_pred), size = 4.5, color = "#C0392B") +
+               linewidth = 4, color = "#F2A6B6", alpha = 0.7) +
+  geom_point(aes(x = date_pred), size = 5, color = "#C0392B") +
   scale_x_date(date_labels = "%b %d") +
-  labs(title = "2026 Predicted Bloom Dates with Intervals",
+  labs(title = "2026 Predicted Bloom Dates",
        x = "Date", y = NULL) +
-  theme_minimal(base_size = 14) +
+  theme_minimal(base_size = 12) +
   theme(panel.grid.major.y = element_blank())
 ```
 
----
-
-## Interpretation {.smaller}
-
-:::: {.columns}
-
-::: {.column width="50%"}
-**Why the ensemble works:**
-
-- Local trend captures site-specific acceleration
-- GAM captures cross-site spatial structure
-- Inverse-MAE blending is purely data-driven
-- Backtest MAE ≈ `r round(mae_ens, 1)` days
-:::
-
-::: {.column width="50%"}
-**Climate signal:**
-
-- Bloom DOY is decreasing at all 5 sites
-- Last two decades are the earliest on record
-- Sparse sites (Vancouver, NYC) borrow strength from 14K+ auxiliary records
 :::
 
 ::::
 
+---
+
+## Thank You {.center}
+
 <br>
 
-**Interval design:** Per-site conformal widths adapt to each location's predictability (wider for Vancouver ≈ `r final_sub |> filter(location == "vancouver") |> mutate(w = upper - lower) |> pull(w)` d, narrower for NYC ≈ `r final_sub |> filter(location == "newyorkcity") |> mutate(w = upper - lower) |> pull(w)` d).
+### Cherry Blossom Peak Bloom Prediction 2026
 
----
+**Team 5103 — University of Maryland**
 
-## Limitations & Future Work {.smaller}
+<br>
 
-| Limitation | Potential improvement |
-|---|---|
-| No direct temperature covariates | NOAA API winter/spring degree-day features |
-| Short records at Vancouver (4 yr) & NYC (5 yr) | Transfer learning / Bayesian priors |
-| Residual weather shocks unpredictable | Ensemble with current-season temperature forecasts |
-| Point uncertainty only from conformal residuals | Full Bayesian credible intervals or quantile regression |
-| No phenological process model | Chill-unit accumulation (e.g., Utah model) |
+::: {.callout-tip}
+All code, data, and outputs are publicly available and fully reproducible.
+:::
 
----
-
-## Reproducibility & Repository Map {.smaller}
-
-```
-peak-bloom-prediction_5103-Team/
-├── solution.qmd               ← Primary R pipeline (abstract + models + predictions)
-├── Solution.ipynb             ← Independent Python pipeline (GBR ensemble)
-├── cherry-predictions.csv      ← R output
-├── cherry-predictions-python.csv ← Python output
-├── cherry-predictions-final.csv  ← Blended final submission
-├── abstract.md                ← Competition abstract (335 words)
-├── slides.qmd                 ← This presentation source
-├── data/                      ← All datasets + README
-└── demo_analysis.qmd          ← Competition-provided demo
-```
-
-**Reproduce everything:**
 ```bash
-quarto render solution.qmd        # R analysis + predictions
-jupyter nbconvert --execute Solution.ipynb --inplace  # Python
-quarto render slides.qmd          # This deck
+quarto render solution.qmd                              # R pipeline
+jupyter nbconvert --execute Solution.ipynb --inplace     # Python pipeline
 ```
-
----
