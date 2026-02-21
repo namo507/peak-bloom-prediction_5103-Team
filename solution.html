@@ -8,7 +8,7 @@
 
 <meta name="author" content="Team 5103">
 
-<title>Cherry Blossom Competition Solution (R)</title>
+<title>Cherry Blossom Peak Bloom Prediction 2026</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -2179,7 +2179,7 @@ vertical-align: -.125em;
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Cherry Blossom Competition Solution (R)</h1>
+<h1 class="title">Cherry Blossom Peak Bloom Prediction 2026</h1>
 </div>
 
 
@@ -2202,6 +2202,16 @@ vertical-align: -.125em;
 </header>
 
 
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>Cherry blossom bloom timing is a sensitive phenological indicator of climate change, yet accurate annual prediction remains difficult because bloom dates emerge from complex, nonlinear interactions among geography, long-term warming trends, and stochastic weather variability. We present an interpretable two-model ensemble that exploits complementary information scales.</p>
+<p><strong>Model A</strong> captures site-specific momentum through a recency-weighted quadratic trend fitted independently to each of the five competition locations (Kyoto, Washington D.C., Liestal, Vancouver, New York City). Exponential decay weights (half-life ≈ 6 years) let recent climate shifts dominate the local signal while retaining curvature from longer records—particularly valuable for Kyoto’s 800+ year series and Washington D.C.’s century of data.</p>
+<p><strong>Model B</strong> learns shared cross-site structure via a pooled Generalized Additive Model (GAM) with smooth terms for calendar year, latitude–longitude interaction, altitude, and per-site observation depth. This model is trained on competition data augmented with three auxiliary time series (Japan regional bloom dates, MeteoSwiss Swiss-wide phenology, and South Korean cherry records) plus both USA-NPN data products—status-intensity observations and individual phenometrics—for the New York City site (Washington Square Park, Site 32789, species 228). The auxiliary data broadens geographic and temporal coverage, helping the GAM generalize across hemispheres and altitudes.</p>
+<p><strong>Ensemble blending</strong> is data-driven: a rolling-origin backtest (validation windows from 1900 to the latest observed year) produces out-of-sample predictions for both models at each site. Inverse-MAE weights, computed globally over this backtest, determine the final blend ratio—giving more influence to whichever model performs better on held-out years.</p>
+<p><strong>Prediction intervals</strong> are calibrated using split-conformal principles. For each location, we take the 90th percentile of the backtest absolute residuals as the half-width, producing intervals that are tight enough to win on the sum-of-squared-widths tiebreaker while maintaining ≥90% empirical coverage.</p>
+<p>A parallel Python implementation (Gradient Boosting Regressor in place of the GAM) provides an independent second opinion. When the two pipelines agree within 4 days on average, we submit a blended point prediction and averaged interval bounds; otherwise we default to the R pipeline. This cross-language ensemble guard reduces model-specific overfitting risk.</p>
+<p>Key features include latitude, longitude, altitude (log-transformed), calendar year (centered and squared), observation-count depth per site, and data-source identity. No proprietary or future-looking data are used; all inputs are publicly available. The Quarto document is fully self-contained and reproducible.</p>
+</section>
 <section id="goal" class="level2">
 <h2 class="anchored" data-anchor-id="goal">Goal</h2>
 <p>This notebook builds a competition-focused ensemble for the next unseen year:</p>
@@ -2260,11 +2270,11 @@ vertical-align: -.125em;
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>      location prediction lower upper predicted_date lower_date upper_date
-1        kyoto         90    80    96     2026-03-31 2026-03-21 2026-04-06
-2      liestal         88    86    90     2026-03-29 2026-03-27 2026-03-31
-3  newyorkcity         94    84   102     2026-04-04 2026-03-25 2026-04-12
-4    vancouver         92    85    99     2026-04-02 2026-03-26 2026-04-09
-5 washingtondc         83    75    91     2026-03-24 2026-03-16 2026-04-01</code></pre>
+1        kyoto         90    83    97     2026-03-31 2026-03-24 2026-04-07
+2      liestal         88    82    93     2026-03-29 2026-03-23 2026-04-03
+3  newyorkcity         92    84   100     2026-04-02 2026-03-25 2026-04-10
+4    vancouver         92    82   103     2026-04-02 2026-03-23 2026-04-13
+5 washingtondc         83    75    90     2026-03-24 2026-03-16 2026-03-31</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -2699,11 +2709,11 @@ vertical-align: -.125em;
 <pre><code># A tibble: 5 × 4
   location     prediction lower upper
   &lt;chr&gt;             &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 kyoto                90    83    97
-2 liestal              88    82    93
-3 newyorkcity          92    84   100
-4 vancouver            92    82   103
-5 washingtondc         83    75    90</code></pre>
+1 kyoto                90    80   100
+2 liestal              88    78    96
+3 newyorkcity          92    85   100
+4 vancouver            92    77   108
+5 washingtondc         83    76    90</code></pre>
 </div>
 </div>
 </section>
