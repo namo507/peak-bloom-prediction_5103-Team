@@ -1,0 +1,35 @@
+# Python dependencies for Cherry Blossom Peak Bloom Prediction
+
+# Core data manipulation
+numpy>=1.20.0
+pandas>=1.3.0
+
+# HTTP requests for API downloads
+requests>=2.26.0
+
+# Weather data
+meteostat>=1.6.0
+
+# Machine learning
+scikit-learn>=1.0.0
+xgboost>=1.5.0
+
+# Quantile regression forests
+quantile-forest>=1.0.0
+
+# Statistical modeling (optional, for mixed-effects in Python)
+statsmodels>=0.13.0
+
+# Data storage (optional, for parquet files)
+pyarrow>=6.0.0
+
+# Plotting (optional, for visualizations)
+matplotlib>=3.4.0
+seaborn>=0.11.0
+
+# Jupyter (for notebooks)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Progress bars (optional)
+tqdm>=4.62.0
