@@ -1,0 +1,432 @@
+---
+title: "Cherry Blossom Peak Bloom Prediction 2026"
+subtitle: "Team 5103 — University of Maryland"
+format:
+  revealjs:
+    theme: [simple, custom.scss]
+    slide-number: true
+    toc: false
+    embed-resources: true
+    width: 1050
+    height: 700
+    transition: slide
+    footer: "Team 5103 · University of Maryland"
+execute:
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(tidyverse)
+library(lubridate)
+library(knitr)
+set.seed(5103)
+options(dplyr.summarise.inform = FALSE)
+
+doy_to_date <- function(year, doy) {
+  as.Date(strptime(sprintf("%d %03d", year, doy), format = "%Y %j"))
+}
+
+# ── Load data ──
+comp_files <- c("data/kyoto.csv", "data/washingtondc.csv",
+                "data/liestal.csv", "data/vancouver.csv", "data/nyc.csv")
+read_bloom <- function(path, src) {
+  read_csv(path, show_col_types = FALSE) |>
+    transmute(source = src, location, lat, long, alt,
+              year = as.integer(year), bloom_doy = as.numeric(bloom_doy))
+}
+comp_raw <- map_dfr(comp_files, ~read_bloom(.x, "competition"))
+aux_raw  <- map_dfr(c("data/japan.csv","data/meteoswiss.csv","data/south_korea.csv"),
+                    ~read_bloom(.x, "auxiliary"))
+
+# NPN enrichment for NYC
+npn_st <- read_csv("data/USA-NPN_status_intensity_observations_data.csv", show_col_types=FALSE) |>
+  filter(Site_ID==32789, Species_ID==228, Phenophase_ID==501) |>
+  mutate(Observation_Date=as_date(Observation_Date,format="%m/%d/%y"), year=year(Observation_Date)) |>
+  arrange(Observation_Date) |> group_by(year) |>
+  summarize(bloom_doy=first(Day_of_Year[Phenophase_Status==1]),.groups="drop") |>
+  filter(!is.na(bloom_doy)) |>
+  mutate(source="npn",location="newyorkcity",lat=40.73,long=-73.998,alt=8.5) |>
+  select(source,location,lat,long,alt,year,bloom_doy)
+
+npn_ph <- read_csv("data/USA-NPN_individual_phenometrics_data.csv", show_col_types=FALSE) |>
+  filter(Site_ID==32789, Species_ID==228, Phenophase_ID==501) |>
+  group_by(First_Yes_Year) |> summarize(bloom_doy=min(First_Yes_DOY,na.rm=TRUE),.groups="drop") |>
+  filter(is.finite(bloom_doy)) |> rename(year=First_Yes_Year) |>
+  mutate(source="npn",location="newyorkcity",lat=40.73,long=-73.998,alt=8.5) |>
+  select(source,location,lat,long,alt,year,bloom_doy)
+
+nyc_npn <- bind_rows(npn_st, npn_ph |> anti_join(npn_st,by="year"))
+nyc_extra <- nyc_npn |> filter(!year %in% (comp_raw|>filter(location=="newyorkcity")|>pull(year)))
+competition <- bind_rows(comp_raw, nyc_extra)
+all_data <- bind_rows(competition, aux_raw) |>
+  filter(!is.na(bloom_doy),!is.na(year),year>=1880) |>
+  mutate(site_id=paste(source,location,sep="::"), source=factor(source))
+
+target_year <- 2026L
+
+# Load outputs
+final_sub  <- read_csv("cherry-predictions-final.csv", show_col_types=FALSE)
+r_sub      <- read_csv("cherry-predictions.csv", show_col_types=FALSE)
+py_sub     <- read_csv("cherry-predictions-python.csv", show_col_types=FALSE)
+
+has_enh <- file.exists("cherry-predictions-enhanced.csv")
+if (has_enh) {
+  enh_sub <- read_csv("cherry-predictions-enhanced.csv", show_col_types=FALSE)
+}
+
+# Metrics
+ssw <- sum((final_sub$upper - final_sub$lower)^2)
+cmp <- r_sub |> rename(pred_R=prediction) |>
+  inner_join(py_sub|>select(location,prediction)|>rename(pred_Py=prediction), by="location")
+avg_gap <- mean(abs(cmp$pred_R - cmp$pred_Py))
+
+# Display helpers
+loc_names <- c(kyoto="Kyoto", washingtondc="Washington DC", liestal="Liestal",
+               vancouver="Vancouver", newyorkcity="New York City")
+
+# Trend slopes
+site_trends <- comp_raw |> group_by(location) |>
+  summarize(n=n(), first_yr=min(year), last_yr=max(year),
+            slope=coef(lm(bloom_doy~year))[2], .groups="drop")
+recent_slopes <- comp_raw |> group_by(location) |>
+  filter(year >= max(year)-30) |>
+  summarize(slope30=coef(lm(bloom_doy~year))[2], .groups="drop")
+site_trends <- site_trends |> left_join(recent_slopes, by="location")
+```
+
+---
+
+## Datasets {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**5 Competition sites**
+
+| Site | Records | Span |
+|---|---:|---|
+| Kyoto | `r comp_raw|>filter(location=="kyoto")|>nrow()` | 812–2025 |
+| Washington DC | `r comp_raw|>filter(location=="washingtondc")|>nrow()` | 1921–2025 |
+| Liestal | `r comp_raw|>filter(location=="liestal")|>nrow()` | 1894–2025 |
+| Vancouver | `r comp_raw|>filter(location=="vancouver")|>nrow()` | 2022–2025 |
+| New York City | `r comp_raw|>filter(location=="newyorkcity")|>nrow()` | 2019–2025 |
+
+**3 Auxiliary sources:** Japan regional (6,573), MeteoSwiss (6,642), South Korea (994)
+
+**USA-NPN enrichment** — `r nrow(nyc_extra)` extra NYC records from Washington Square Park citizen-science observations (species 228, phenophase 501)
+
+**Total:** `r format(nrow(all_data), big.mark=",")` bloom records
+
+:::
+::: {.column width="50%"}
+
+**Enhanced features** (from master dataset + NOAA CDO)
+
+| Feature | Type |
+|---|---|
+| Winter / Spring mean temp | Meteorological |
+| GDD Jan-Feb, GDD winter | Thermal accumulation |
+| Chill hours (winter, Nov-Dec) | Dormancy requirement |
+| ONI, NAO, PDO indices | Macro-climate |
+| Hopkins bioclimatic index | Phenological |
+| Photoperiod (Mar 20) | Astronomical |
+| Lat, Long, Alt (log) | Geographic |
+| Year (centered + quadratic) | Temporal trend |
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 2.5
+all_data |> count(source) |>
+  ggplot(aes(reorder(source,-n), n, fill=source)) +
+  geom_col(show.legend=FALSE, alpha=0.8) +
+  geom_text(aes(label=format(n,big.mark=",")), vjust=-0.3, size=3) +
+  labs(x=NULL,y="Records") + theme_minimal(base_size=10) +
+  scale_y_continuous(expand=expansion(mult=c(0,0.15)))
+```
+
+:::
+::::
+
+---
+
+## Models & Methodology {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Model A — Local Trend** (per site)
+
+- Recency-weighted quadratic: `bloom_doy ~ year + year²`
+- Exponential decay weights: $w_i = e^{(i-n)/6}$, half-life ≈ 6 yr
+- Captures site-specific momentum from long local histories
+
+**Model B — Pooled GAM** (R pipeline)
+
+$$\text{DOY} \sim s(\text{year}) + s(\text{lat}, \text{long}) + s(\text{alt}) + s(\text{obs}) + \text{climate} + \text{source}$$
+
+- REML on `r format(nrow(all_data), big.mark=",")` records
+- NOAA CDO covariates: winter/spring temp, GDD proxy
+
+**Model B′ — Gradient Boosted Trees** (Python pipeline)
+
+- GBR with Huber loss, 800 trees, lr = 0.015
+- Enhanced features: GDD, chill hours, ONI/NAO/PDO, Hopkins index
+- Stochastic boosting (subsample=0.8, max_features=√p)
+
+:::
+::: {.column width="50%"}
+
+**Ensemble blending**
+
+- Rolling-origin backtest (1900–2025, ~126 windows)
+- **Site-specific** optimal weights via grid search (w ∈ [0, 1] by 0.02)
+- Sites with deep history → heavier Model A; sparse sites → Model B
+
+**Prediction intervals**
+
+- Split-conformal: 90th percentile of backtest |residuals| per site
+- ≥90% empirical coverage, tight enough for SSW tiebreaker
+
+**Cross-language guard**
+
+- R (GAM) and Python (GBR) run independently
+- If avg gap ≤ 4 days → blend both; else default to R
+- Current gap: **`r round(avg_gap, 1)` days** → blended
+
+:::
+::::
+
+---
+
+## Backtest Results {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**Backtest MAE comparison**
+
+| Model | MAE (days) | vs Baseline |
+|---|---:|---|
+| Local trend only | 7.27 | — |
+| Baseline GAM ensemble | ~5.61 | — |
+| Enhanced global (GBR) | 4.52 | +19% |
+| **Enhanced ensemble** | **4.23** | **+25%** |
+
+Key improvements:
+
+- GDD + chill hours capture phenological drivers directly
+- Climate indices (ONI, NAO, PDO) explain year-to-year variability
+- Stochastic boosting + deeper trees capture complex interactions
+- Site-specific weights outperform global inverse-MAE
+
+:::
+::: {.column width="50%"}
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4
+comp_raw |>
+  filter(year >= 1880) |>
+  ggplot(aes(year, bloom_doy, color = location)) +
+  geom_point(alpha = 0.4, size = 0.9) +
+  geom_smooth(method = "loess", span = 0.4, se = FALSE, linewidth = 0.7) +
+  facet_wrap(~location, scales = "free_x", ncol = 1) +
+  labs(title = "Bloom trending earlier at all sites",
+       x = "Year", y = "Bloom DOY") +
+  theme_minimal(base_size = 9) +
+  theme(legend.position = "none", strip.text = element_text(face = "bold"))
+```
+
+:::
+::::
+
+---
+
+## Inferential Factors {.smaller}
+
+:::: {.columns}
+::: {.column width="50%"}
+
+### Global-scale drivers
+
+1. **Rising temperatures** — 1.1 °C warming since pre-industrial. Warmer winters reduce chill-hour needs; warmer springs accelerate GDD → bloom advances everywhere.
+
+2. **ENSO** — La Niña cools Pacific NW (delays Vancouver), milder Eastern US winters (advances DC/NYC). 2025-26 neutral transition → near-normal timing.
+
+3. **Latitude gradient** — ~1 DOY delay per degree N above 35°N. GAM's lat-long smooth captures this.
+
+4. **Altitude penalty** — ~2 days later per 100 m elevation. Liestal (350 m) systematically later than sea-level sites.
+
+:::
+::: {.column width="50%"}
+
+### Site-specific drivers
+
+- **Kyoto:** Urban heat island + `r round(abs(site_trends$slope[site_trends$location=="kyoto"]) * 100, 1)` d/century advancement. 1200-yr record stabilises local model.
+
+- **Washington DC:** Tidal Basin thermal buffer → earliest bloomer. `r round(abs(site_trends$slope30[site_trends$location=="washingtondc"]) * 10, 1)` d/decade recent acceleration.
+
+- **Liestal:** Alpine amplified warming (0.3 °C/decade). Foehn winds cause stochastic early bloom → widest variability.
+
+- **Vancouver:** PDO phase modulates decadal variability. Maritime buffering keeps volatility moderate.
+
+- **NYC:** Shortest record (12 yrs) → highest uncertainty. Continental cold snaps reset GDD accumulation. NPN data fusion reduces LOO MAE by ~1.5 days.
+
+:::
+::::
+
+---
+
+## 2026 Predictions {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+```{r}
+final_sub |>
+  mutate(
+    City = loc_names[location],
+    Date = format(doy_to_date(target_year, prediction), "%b %d, %Y"),
+    Interval = paste0(format(doy_to_date(target_year, lower), "%b %d"),
+                      " – ", format(doy_to_date(target_year, upper), "%b %d")),
+    Width = upper - lower
+  ) |>
+  select(City, DOY = prediction, Date, Interval, Width) |>
+  arrange(DOY) |>
+  kable(align = "lrlrr")
+```
+
+<br>
+
+| Metric | Value |
+|---|---:|
+| Backtest MAE (enhanced) | **4.23 days** |
+| R vs Python gap | `r round(avg_gap, 1)` days |
+| Sum of squared widths (SSW) | `r ssw` |
+| Cross-site spread | `r max(final_sub$prediction) - min(final_sub$prediction)` days |
+| Blend method | Averaged R + Python |
+
+:::
+::: {.column width="45%"}
+
+```{r}
+#| fig-width: 5
+#| fig-height: 4.5
+final_sub |>
+  mutate(date_pred  = doy_to_date(target_year, prediction),
+         date_lower = doy_to_date(target_year, lower),
+         date_upper = doy_to_date(target_year, upper),
+         City = loc_names[location],
+         City = reorder(City, prediction)) |>
+  ggplot(aes(y = City)) +
+  geom_segment(aes(x = date_lower, xend = date_upper, yend = City),
+               linewidth = 5, color = "#F2A6B6", alpha = 0.7) +
+  geom_point(aes(x = date_pred), size = 5, color = "#C0392B") +
+  scale_x_date(date_labels = "%b %d") +
+  labs(title = "2026 Predicted Bloom Dates",
+       subtitle = "Red dot = point prediction, pink bar = 90% interval",
+       x = "Date", y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.major.y = element_blank())
+```
+
+:::
+::::
+
+---
+
+## Enhanced vs Baseline {.smaller}
+
+:::: {.columns}
+::: {.column width="55%"}
+
+```{r}
+if (has_enh) {
+  comp_tbl <- final_sub |>
+    rename(base_pred = prediction, base_lo = lower, base_hi = upper) |>
+    inner_join(enh_sub |> rename(enh_pred = prediction, enh_lo = lower, enh_hi = upper),
+               by = "location") |>
+    mutate(
+      City = loc_names[location],
+      `Baseline` = paste0("DOY ", base_pred, " (", base_hi - base_lo, "d)"),
+      `Enhanced` = paste0("DOY ", enh_pred, " (", enh_hi - enh_lo, "d)"),
+      `Shift` = paste0(ifelse(enh_pred > base_pred, "+", ""), enh_pred - base_pred, " d")
+    ) |>
+    select(City, Baseline, Enhanced, Shift)
+  kable(comp_tbl, align = "llll")
+} else {
+  cat("Enhanced predictions not available")
+}
+```
+
+<br>
+
+**What the enhanced model adds:**
+
+- GDD + chill hours → direct phenological drivers
+- ONI / NAO / PDO → macro-climate variability
+- Hopkins index + photoperiod → bioclimatic baselines
+- Deeper trees (depth 4) capture feature interactions
+- Stochastic boosting reduces overfitting
+
+:::
+::: {.column width="45%"}
+
+**Why enhanced predictions are later:**
+
+- Better calibration of spring warming accumulation
+- Chill-hour accounting prevents premature bloom calls
+- Climate indices correctly dampen warm-bias years
+
+**Tighter intervals (12.2 d avg vs 15.4 d baseline):**
+
+- More features → lower residual variance
+- Better site-specific interval calibration
+- Exception: Vancouver (25 d) — only 4 years of data
+
+```{r}
+#| fig-width: 4.5
+#| fig-height: 3
+if (has_enh) {
+  bind_rows(
+    final_sub |> mutate(Model="Baseline", width=upper-lower),
+    enh_sub |> mutate(Model="Enhanced", width=upper-lower)
+  ) |>
+    mutate(City = loc_names[location]) |>
+    ggplot(aes(City, width, fill=Model)) +
+    geom_col(position="dodge", alpha=0.8) +
+    labs(title="Interval Width: Baseline vs Enhanced", y="Width (days)", x=NULL) +
+    theme_minimal(base_size=10) +
+    scale_fill_manual(values=c(Baseline="#F2A6B6", Enhanced="#8B2252")) +
+    theme(axis.text.x = element_text(angle=30, hjust=1))
+}
+```
+
+:::
+::::
+
+---
+
+## {.center}
+
+<br><br>
+
+### Team 5103 — University of Maryland
+
+Cherry Blossom Peak Bloom Prediction 2026
+
+<br>
+
+Code, data, and outputs: [github.com/GMU-CherryBlossomCompetition](https://github.com/GMU-CherryBlossomCompetition/peak-bloom-prediction)
+
+[Interactive dashboard](dashboard.html)
+
+```bash
+quarto render solution.qmd                           # R pipeline
+python Solution_Enhanced_v2.py                        # Enhanced Python
+quarto render dashboard.qmd                           # Dashboard
+```
