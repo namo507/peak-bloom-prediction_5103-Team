@@ -22,8 +22,9 @@ data/processed/
 data/final/*.csv
 data/final/*.parquet
 
-# But keep data dictionaries and small config files
+# But keep data dictionaries and essential datasets for model reproducibility
 !data/final/data_dictionary.csv
+!data/final/master_dataset.csv
 
 # IDE
 .vscode/
