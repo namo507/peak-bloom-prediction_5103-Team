@@ -1,7 +1,7 @@
 ---
 title: "Cherry Blossom Peak Bloom Prediction 2026"
 subtitle: "Methodology, Data Analysis & Final Predictions · Team 5103"
-author: "Team 5103 — George Mason University"
+author: "Team 5103 — University of Maryland"
 date: "February 2026"
 format:
   revealjs:
@@ -670,17 +670,3 @@ quarto render slides.qmd          # This deck
 ```
 
 ---
-
-## Thank You {.center}
-
-<br><br>
-
-### Peak Bloom Prediction 2026
-
-**Team 5103** · George Mason University
-
-<br>
-
-::: {.callout-tip}
-All code, data, and outputs are publicly available and fully reproducible.
-:::
