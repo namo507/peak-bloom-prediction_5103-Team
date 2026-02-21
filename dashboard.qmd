@@ -1,0 +1,315 @@
+---
+title: "Cherry Blossom Forecast Dashboard 2026"
+author: "Team 5103 — University of Maryland"
+format:
+  dashboard:
+    orientation: rows
+    nav-buttons: [github]
+    theme: cosmo
+execute:
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+required_pkgs <- c("tidyverse", "plotly", "DT", "lubridate")
+missing_pkgs <- required_pkgs[!vapply(required_pkgs, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_pkgs) > 0) {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
+  install.packages(missing_pkgs)
+}
+
+library(tidyverse)
+library(plotly)
+library(DT)
+library(lubridate)
+
+read_bloom_file <- function(path) {
+  readr::read_csv(path, show_col_types = FALSE) |>
+    transmute(location, year = as.integer(year), bloom_doy = as.numeric(bloom_doy))
+}
+
+doy_to_date <- function(year, doy) {
+  as.Date(strptime(sprintf("%d %03d", as.integer(year), as.integer(doy)), format = "%Y %j"))
+}
+
+competition_files <- c(
+  "data/kyoto.csv", "data/washingtondc.csv", "data/liestal.csv", "data/vancouver.csv", "data/nyc.csv"
+)
+
+hist_data <- purrr::map_dfr(competition_files, read_bloom_file)
+
+pred_r <- readr::read_csv("cherry-predictions.csv", show_col_types = FALSE) |>
+  rename(prediction_r = prediction, lower_r = lower, upper_r = upper)
+pred_py <- readr::read_csv("cherry-predictions-python.csv", show_col_types = FALSE) |>
+  rename(prediction_py = prediction, lower_py = lower, upper_py = upper)
+pred_final <- readr::read_csv("cherry-predictions-final.csv", show_col_types = FALSE)
+
+target_year <- max(hist_data$year, na.rm = TRUE) + 1L
+
+final_enriched <- pred_final |>
+  mutate(
+    predicted_date = doy_to_date(target_year, prediction),
+    lower_date = doy_to_date(target_year, lower),
+    upper_date = doy_to_date(target_year, upper),
+    interval_width = upper - lower
+  ) |>
+  arrange(location)
+
+model_cmp <- pred_r |>
+  inner_join(pred_py, by = "location") |>
+  inner_join(pred_final, by = "location") |>
+  mutate(
+    r_py_gap = abs(prediction_r - prediction_py),
+    r_final_gap = abs(prediction_r - prediction),
+    py_final_gap = abs(prediction_py - prediction)
+  )
+
+site_trends <- hist_data |>
+  group_by(location) |>
+  summarize(
+    n_years = n(),
+    first_year = min(year, na.rm = TRUE),
+    last_year = max(year, na.rm = TRUE),
+    slope_per_year = coef(lm(bloom_doy ~ year))[2],
+    .groups = "drop"
+  )
+
+kpi_mean_doy <- round(mean(final_enriched$prediction), 1)
+kpi_mean_width <- round(mean(final_enriched$interval_width), 1)
+kpi_model_gap <- round(mean(model_cmp$r_py_gap), 2)
+kpi_ssw <- sum((final_enriched$interval_width)^2)
+
+loc_coords <- readr::read_csv("data/kyoto.csv", show_col_types = FALSE) |>
+  select(location, lat, long, alt) |>
+  bind_rows(readr::read_csv("data/washingtondc.csv", show_col_types = FALSE) |> select(location, lat, long, alt)) |>
+  bind_rows(readr::read_csv("data/liestal.csv", show_col_types = FALSE) |> select(location, lat, long, alt)) |>
+  bind_rows(readr::read_csv("data/vancouver.csv", show_col_types = FALSE) |> select(location, lat, long, alt)) |>
+  bind_rows(readr::read_csv("data/nyc.csv", show_col_types = FALSE) |> select(location, lat, long, alt)) |>
+  group_by(location) |>
+  summarize(lat = first(lat), long = first(long), alt = first(alt), .groups = "drop")
+
+map_data <- final_enriched |>
+  left_join(loc_coords, by = "location")
+```
+
+Row {height=115}
+-------------------------------------
+
+### Mean Predicted DOY
+
+```{r}
+#| content: valuebox
+list(
+  icon = "calendar-event",
+  value = kpi_mean_doy,
+  caption = paste0("Average 2026 prediction across ", nrow(final_enriched), " locations")
+)
+```
+
+### Mean Interval Width
+
+```{r}
+#| content: valuebox
+list(
+  icon = "arrows-expand",
+  value = paste0(kpi_mean_width, " days"),
+  caption = "Average uncertainty width (upper - lower)"
+)
+```
+
+### R vs Python Gap
+
+```{r}
+#| content: valuebox
+list(
+  icon = "diagram-3",
+  value = paste0(kpi_model_gap, " days"),
+  caption = "Mean absolute gap between independent pipelines"
+)
+```
+
+### Interval Width Score
+
+```{r}
+#| content: valuebox
+list(
+  icon = "bar-chart",
+  value = kpi_ssw,
+  caption = "Sum of squared interval widths (tiebreak metric)"
+)
+```
+
+Row
+-------------------------------------
+
+### Final 2026 Predictions (Interactive Table)
+
+```{r}
+final_enriched |>
+  transmute(
+    location,
+    prediction,
+    predicted_date = format(predicted_date, "%Y-%m-%d"),
+    lower,
+    upper,
+    interval_width,
+    interval = paste0(format(lower_date, "%b %d"), " – ", format(upper_date, "%b %d"))
+  ) |>
+  datatable(
+    rownames = FALSE,
+    filter = "top",
+    options = list(pageLength = 10, scrollX = TRUE),
+    caption = "Search, sort, and filter the official 2026 submission predictions"
+  )
+```
+
+### Model Comparison by Site
+
+```{r}
+cmp_long <- model_cmp |>
+  select(location, prediction_r, prediction_py, prediction) |>
+  rename(R = prediction_r, Python = prediction_py, Final = prediction) |>
+  pivot_longer(cols = c(R, Python, Final), names_to = "model", values_to = "doy")
+
+plot_ly(
+  cmp_long,
+  x = ~location,
+  y = ~doy,
+  color = ~model,
+  type = "bar",
+  barmode = "group",
+  hovertemplate = "Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra></extra>"
+) |>
+  layout(
+    title = "R vs Python vs Final prediction",
+    yaxis = list(title = "Predicted bloom day (DOY)"),
+    xaxis = list(title = "")
+  )
+```
+
+Row
+-------------------------------------
+
+### Historical Trend + 2026 Prediction (Interactive)
+
+```{r}
+plot_ly(
+  hist_data,
+  x = ~year,
+  y = ~bloom_doy,
+  color = ~location,
+  type = "scatter",
+  mode = "lines+markers",
+  hovertemplate = "Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra></extra>"
+) |>
+  add_markers(
+    data = final_enriched,
+    x = ~year,
+    y = ~prediction,
+    color = ~location,
+    marker = list(size = 11, symbol = "diamond"),
+    error_y = ~list(type = "data", symmetric = FALSE,
+                    array = upper - prediction,
+                    arrayminus = prediction - lower),
+    hovertemplate = "Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra></extra>",
+    customdata = ~cbind(location, lower, upper),
+    showlegend = FALSE
+  ) |>
+  layout(
+    title = "Historical Bloom Series with 2026 Forecast + Intervals",
+    xaxis = list(title = "Year"),
+    yaxis = list(title = "Bloom DOY")
+  )
+```
+
+### Global Prediction Map
+
+```{r}
+plot_ly(
+  map_data,
+  type = "scattergeo",
+  mode = "markers+text",
+  lon = ~long,
+  lat = ~lat,
+  text = ~location,
+  textposition = "top center",
+  marker = list(
+    size = 14,
+    color = ~prediction,
+    colorscale = "RdYlBu",
+    reversescale = TRUE,
+    colorbar = list(title = "Pred DOY")
+  ),
+  hovertemplate = paste(
+    "<b>%{text}</b><br>",
+    "Prediction: %{marker.color}<br>",
+    "Interval: %{customdata[1]} to %{customdata[2]}<br>",
+    "Predicted date: %{customdata[3]}<extra></extra>"
+  ),
+  customdata = ~cbind(lower, upper, format(predicted_date, "%Y-%m-%d"))
+) |>
+  layout(
+    title = "2026 Forecasts Across the Five Competition Sites",
+    geo = list(showland = TRUE, landcolor = "rgb(243,243,243)", showcountries = TRUE)
+  )
+```
+
+Row
+-------------------------------------
+
+### Trend Metrics by Site
+
+```{r}
+site_trends |>
+  mutate(
+    slope_per_decade = round(slope_per_year * 10, 2),
+    interpretation = if_else(slope_per_year < 0, "Earlier bloom trend", "Later bloom trend")
+  ) |>
+  select(location, n_years, first_year, last_year, slope_per_decade, interpretation) |>
+  datatable(
+    rownames = FALSE,
+    options = list(pageLength = 10, scrollX = TRUE),
+    caption = "Linear trend slope shown as DOY change per decade (negative = earlier bloom)"
+  )
+```
+
+### Notes
+
+This dashboard is fully reproducible from:
+
+- `data/*.csv`
+- `cherry-predictions.csv`
+- `cherry-predictions-python.csv`
+- `cherry-predictions-final.csv`
+
+To refresh after model updates, run:
+
+```bash
+quarto render solution.qmd
+jupyter nbconvert --to notebook --execute Solution.ipynb --inplace
+quarto render dashboard.qmd
+```
+
+Row
+-------------------------------------
+
+### Downloads
+
+- [Download final submission CSV](cherry-predictions-final.csv)
+- [Download R pipeline submission CSV](cherry-predictions.csv)
+- [Download Python pipeline submission CSV](cherry-predictions-python.csv)
+- [Open rendered dashboard HTML](dashboard.html)
+
+### Export Guide
+
+- Plotly charts support the built-in camera icon to export static PNG snapshots.
+- Use your browser print dialog (`Cmd+P`) on `dashboard.html` to save a PDF report.
+- Re-run data and refresh assets before exporting:
+
+```bash
+quarto render solution.qmd
+jupyter nbconvert --to notebook --execute Solution.ipynb --inplace
+quarto render dashboard.qmd
+```

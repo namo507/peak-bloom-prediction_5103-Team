@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Team 5103 — University of Maryland">
+
+<title>Cherry Blossom Forecast Dashboard 2026</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="dashboard_files/libs/clipboard/clipboard.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-html/popper.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="dashboard_files/libs/quarto-html/anchor.min.js"></script>
+<link href="dashboard_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-dark-2fef5ea3f8957b3e4ecc936fc74692ca.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="dashboard_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="dashboard_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="dashboard_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="dashboard_files/libs/bootstrap/bootstrap-e34e999c5ec40446cda825c9d876ac62.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="dashboard_files/libs/bootstrap/bootstrap-dark-e34e999c5ec40446cda825c9d876ac62.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<link href="dashboard_files/libs/bootstrap/bootstrap-e34e999c5ec40446cda825c9d876ac62.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="dashboard_files/libs/quarto-dashboard/quarto-dashboard.js"></script>
+<script src="dashboard_files/libs/quarto-dashboard/stickythead.js"></script>
+
+
+
+<script src="dashboard_files/libs/quarto-dashboard/web-components.js" type="module"></script>
+<script src="dashboard_files/libs/quarto-dashboard/components.js"></script>
+
+<link href="dashboard_files/libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="dashboard_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="dashboard_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="dashboard_files/libs/datatables-binding-0.33/datatables.js"></script>
+<script src="dashboard_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="dashboard_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="dashboard_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="dashboard_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="dashboard_files/libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet">
+<script src="dashboard_files/libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="dashboard_files/libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet">
+<script src="dashboard_files/libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="dashboard_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="dashboard_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<script src="dashboard_files/libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="dashboard_files/libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="dashboard_files/libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="dashboard_files/libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+
+
+</head>
+
+<body class="quarto-dashboard dashboard-fill fullcontent quarto-light">
+
+<header id="quarto-dashboard-header">
+<nav class="navbar navbar-expand-md slim" data-bs-theme="dark">
+  <div class="navbar-container container-fluid">
+    <button class="navbar-toggler hidden" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-controls="dashboard-collapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>    
+
+
+    <div class="navbar-brand-container">       
+
+      <div class="navbar-title">
+        <div class="navbar-title-text"><a href="#">Cherry Blossom Forecast Dashboard 2026</a></div>
+        
+        <div class="navbar-author">Team 5103 — University of Maryland</div>
+      </div>
+    </div>
+<div class="quarto-dashboard-links"><a class="quarto-dashboard-link" href="https://github.com/namo507/peak-bloom-prediction_5103-Team/" title="GitHub"><i class="bi bi-github"></i></a></div></div>
+</nav>
+</header>
+<div class="page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill">  
+
+<div class="bslib-grid-item html-fill-item bslib-grid" data-layout="fill" style="display: grid; grid-template-rows: 115px minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card valuebox cell bslib-card html-fill-container bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
+<div class="card-body html-fill-item html-fill-container">
+<div data-icon="calendar-event" class="html-fill-item html-fill-container value-box-grid">
+<div class="value-box-showcase html-fill-item html-fill-container">
+
+<i class="bi bi-calendar-event"></i></div>
+<div class="value-box-area">
+<p class="value-box-title">
+&nbsp;
+</p>
+<p class="value-box-value">
+88
+</p>
+</div>
+</div>
+</div>
+<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card valuebox cell bslib-card html-fill-container bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
+<div class="card-body html-fill-item html-fill-container">
+<div data-icon="arrows-expand" class="html-fill-item html-fill-container value-box-grid">
+<div class="value-box-showcase html-fill-item html-fill-container">
+
+<i class="bi bi-arrows-expand"></i></div>
+<div class="value-box-area">
+<p class="value-box-title">
+&nbsp;
+</p>
+<p class="value-box-value">
+17 days
+</p>
+</div>
+</div>
+</div>
+<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card valuebox cell bslib-card html-fill-container bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
+<div class="card-body html-fill-item html-fill-container">
+<div data-icon="diagram-3" class="html-fill-item html-fill-container value-box-grid">
+<div class="value-box-showcase html-fill-item html-fill-container">
+
+<i class="bi bi-diagram-3"></i></div>
+<div class="value-box-area">
+<p class="value-box-title">
+&nbsp;
+</p>
+<p class="value-box-value">
+2.8 days
+</p>
+</div>
+</div>
+</div>
+<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card valuebox cell bslib-card html-fill-container bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
+<div class="card-body html-fill-item html-fill-container">
+<div data-icon="bar-chart" class="html-fill-item html-fill-container value-box-grid">
+<div class="value-box-showcase html-fill-item html-fill-container">
+
+<i class="bi bi-bar-chart"></i></div>
+<div class="value-box-area">
+<p class="value-box-title">
+&nbsp;
+</p>
+<p class="value-box-value">
+1463
+</p>
+</div>
+</div>
+</div>
+<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-e969a97d64a6552a6e32" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-e969a97d64a6552a6e32">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"84\" data-max=\"92\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"76\" data-max=\"84\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"91\" data-max=\"100\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"15\" data-max=\"20\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>Search, sort, and filter the official 2026 submission predictions<\/caption>","data":[["kyoto","liestal","newyorkcity","vancouver","washingtondc"],[88,86,92,90,84],["2026-03-29","2026-03-27","2026-04-02","2026-03-31","2026-03-25"],[79,78,84,80,76],[97,95,99,100,91],[18,17,15,20,15],["Mar 20 – Apr 07","Mar 19 – Apr 05","Mar 25 – Apr 09","Mar 21 – Apr 10","Mar 17 – Apr 01"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>location<\/th>\n      <th>prediction<\/th>\n      <th>predicted_date<\/th>\n      <th>lower<\/th>\n      <th>upper<\/th>\n      <th>interval_width<\/th>\n      <th>interval<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"bPaginate":false,"dom":"ifrt","language":{"info":"Showing _TOTAL_ entries"},"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,3,4,5]},{"name":"location","targets":0},{"name":"prediction","targets":1},{"name":"predicted_date","targets":2},{"name":"lower","targets":3},{"name":"upper","targets":4},{"name":"interval_width","targets":5},{"name":"interval","targets":6}],"order":[],"autoWidth":false,"orderClasses":false,"orderCellsTop":true}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="plotly html-widget html-fill-item html-fill-container" id="htmlwidget-436a2a45c72264e81c6b" style="width:100%;height:406px;"></div>
+<script type="application/json" data-for="htmlwidget-436a2a45c72264e81c6b">{"x":{"visdat":{"16684667e126d":["function () ","plotlyVisDat"]},"cur_data":"16684667e126d","attrs":{"16684667e126d":{"x":{},"y":{},"barmode":"group","hovertemplate":"Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"bar"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"R vs Python vs Final prediction","yaxis":{"domain":[0,1],"automargin":true,"title":"Predicted bloom day (DOY)"},"xaxis":{"domain":[0,1],"automargin":true,"title":"","type":"category","categoryorder":"array","categoryarray":["kyoto","liestal","newyorkcity","vancouver","washingtondc"]},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":["kyoto","liestal","newyorkcity","vancouver","washingtondc"],"y":[88,86,92,90,84],"barmode":"group","hovertemplate":["Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>"],"type":"bar","name":"Final","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["kyoto","liestal","newyorkcity","vancouver","washingtondc"],"y":[91,87,89,90,84],"barmode":"group","hovertemplate":["Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>"],"type":"bar","name":"Python","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["kyoto","liestal","newyorkcity","vancouver","washingtondc"],"y":[85,86,94,89,83],"barmode":"group","hovertemplate":["Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>","Location: %{x}<br>Model: %{marker.color}<br>DOY: %{y}<extra><\/extra>"],"type":"bar","name":"R","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="plotly html-widget html-fill-item html-fill-container" id="htmlwidget-2a53f30d15dee52d0be4" style="width:100%;height:406px;"></div>
+<script type="application/json" data-for="htmlwidget-2a53f30d15dee52d0be4">{"x":{"visdat":{"166846e9b7adc":["function () ","plotlyVisDat"],"16684219f3a3f":["function () ","data"]},"cur_data":"16684219f3a3f","attrs":{"166846e9b7adc":{"x":{},"y":{},"mode":"lines+markers","hovertemplate":"Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"},"16684219f3a3f":{"x":{},"y":{},"mode":"markers","hovertemplate":"Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","color":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter","marker":{"size":11,"symbol":"diamond"},"error_y":{},"customdata":{},"showlegend":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Historical Bloom Series with 2026 Forecast + Intervals","xaxis":{"domain":[0,1],"automargin":true,"title":"Year"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Bloom DOY"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[812,815,831,851,853,864,866,869,889,891,892,894,895,896,902,908,912,913,917,923,926,930,933,941,949,950,955,957,958,959,960,961,963,965,966,967,969,972,974,975,977,979,985,989,991,1000,1004,1006,1007,1014,1016,1017,1018,1019,1029,1031,1032,1033,1034,1036,1041,1046,1048,1050,1060,1061,1066,1071,1073,1080,1083,1084,1088,1090,1093,1095,1096,1098,1099,1102,1104,1105,1107,1111,1112,1114,1117,1118,1120,1123,1124,1125,1126,1127,1128,1129,1130,1131,1134,1139,1140,1141,1143,1145,1151,1154,1156,1159,1161,1163,1164,1165,1166,1167,1169,1170,1172,1173,1174,1175,1176,1179,1180,1182,1183,1184,1185,1187,1188,1190,1191,1194,1199,1200,1201,1202,1203,1204,1205,1207,1210,1212,1213,1214,1215,1216,1219,1220,1221,1223,1225,1226,1227,1229,1230,1231,1232,1233,1235,1236,1240,1244,1245,1246,1247,1249,1250,1251,1254,1257,1259,1262,1263,1264,1265,1267,1268,1269,1271,1275,1278,1279,1280,1283,1284,1285,1286,1287,1288,1289,1292,1294,1295,1301,1302,1307,1311,1312,1314,1315,1316,1317,1319,1321,1322,1323,1324,1326,1329,1330,1331,1332,1342,1344,1346,1347,1349,1350,1351,1356,1357,1358,1359,1360,1361,1363,1364,1366,1367,1368,1369,1370,1372,1373,1375,1376,1377,1378,1379,1380,1381,1382,1383,1384,1385,1386,1387,1388,1398,1401,1402,1403,1406,1407,1408,1409,1410,1412,1413,1415,1416,1417,1418,1419,1420,1421,1422,1423,1424,1425,1426,1427,1429,1430,1431,1432,1433,1434,1435,1436,1437,1438,1439,1440,1441,1443,1444,1446,1447,1448,1449,1450,1451,1452,1453,1454,1455,1456,1457,1458,1459,1460,1461,1462,1463,1464,1465,1466,1467,1468,1472,1474,1476,1477,1478,1479,1480,1481,1482,1483,1484,1485,1486,1487,1488,1489,1490,1491,1492,1493,1494,1495,1496,1497,1498,1499,1500,1501,1502,1503,1504,1505,1506,1507,1508,1509,1510,1511,1512,1513,1514,1515,1516,1517,1518,1519,1520,1521,1522,1523,1524,1525,1526,1527,1528,1529,1530,1531,1532,1533,1534,1535,1536,1537,1538,1539,1540,1541,1542,1543,1544,1545,1546,1547,1548,1549,1550,1551,1552,1553,1555,1556,1557,1558,1559,1560,1561,1562,1563,1564,1565,1566,1567,1568,1570,1571,1572,1574,1576,1577,1579,1580,1581,1583,1584,1585,1586,1587,1588,1589,1590,1591,1592,1593,1594,1595,1596,1597,1598,1599,1600,1601,1602,1603,1604,1605,1606,1607,1609,1610,1612,1613,1614,1615,1616,1617,1618,1619,1621,1622,1623,1624,1625,1626,1628,1629,1632,1633,1634,1635,1637,1638,1639,1640,1641,1642,1643,1644,1645,1646,1647,1649,1650,1651,1652,1653,1654,1655,1656,1658,1660,1661,1662,1663,1664,1665,1666,1667,1668,1669,1670,1671,1672,1673,1674,1675,1676,1677,1678,1679,1680,1681,1682,1683,1684,1685,1686,1687,1688,1689,1690,1691,1692,1693,1694,1695,1696,1697,1698,1699,1700,1701,1702,1703,1704,1705,1706,1707,1708,1709,1713,1714,1715,1716,1717,1718,1719,1720,1721,1722,1723,1724,1725,1726,1727,1728,1729,1731,1732,1733,1734,1735,1736,1737,1738,1739,1740,1741,1742,1743,1744,1745,1746,1747,1748,1749,1750,1751,1752,1753,1754,1755,1756,1757,1758,1759,1760,1761,1762,1763,1764,1765,1766,1767,1768,1769,1770,1771,1772,1773,1774,1775,1776,1777,1778,1779,1780,1781,1782,1783,1784,1785,1786,1787,1788,1789,1790,1791,1792,1793,1794,1795,1796,1797,1798,1799,1800,1801,1802,1803,1804,1805,1806,1807,1808,1809,1810,1811,1812,1813,1814,1815,1816,1817,1818,1819,1820,1821,1822,1823,1824,1825,1826,1827,1828,1829,1830,1831,1832,1833,1834,1835,1836,1837,1838,1839,1840,1841,1842,1843,1844,1845,1846,1847,1848,1849,1850,1851,1852,1853,1854,1855,1856,1857,1858,1859,1860,1861,1862,1863,1864,1865,1866,1867,1868,1869,1870,1871,1873,1874,1875,1876,1877,1878,1879,1880,1881,1882,1883,1884,1885,1886,1887,1888,1889,1890,1891,1892,1893,1894,1896,1897,1898,1899,1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1913,1914,1915,1916,1917,1918,1920,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,1933,1934,1935,1936,1937,1938,1939,1940,1941,1942,1943,1944,1946,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"y":[92,105,96,108,104,100,106,95,104,109,108,106,104,104,102,98,95,110,95,104,98,97,106,109,107,95,89,112,109,97,101,87,94,104,98,103,98,107,108,101,112,104,94,100,104,105,117,100,106,115,111,99,113,98,116,97,111,102,96,104,103,103,112,105,108,92,105,113,103,102,96,120,104,105,105,100,96,100,103,104,108,114,105,113,104,100,109,102,104,112,98,111,108,107,111,106,103,103,106,113,103,111,110,107,109,96,90,103,112,112,100,106,95,111,112,113,103,117,112,113,113,103,98,104,101,115,115,104,107,112,106,119,109,104,96,106,105,110,105,104,112,98,107,102,108,101,101,109,99,116,105,106,111,97,102,101,92,105,110,87,106,108,108,98,106,108,116,100,110,94,96,97,120,103,98,105,103,100,100,107,113,101,102,103,102,105,112,110,108,107,107,101,102,95,96,104,94,100,101,111,103,102,116,102,106,124,98,107,112,108,112,115,110,102,107,109,112,101,115,117,107,110,105,101,108,107,110,112,97,88,94,109,102,110,103,99,105,104,103,102,108,105,102,98,99,105,100,99,106,101,103,104,102,101,111,86,102,93,91,105,101,109,98,100,112,99,109,96,103,98,99,102,98,108,102,104,98,113,95,101,103,99,101,98,105,107,109,108,111,96,95,100,103,92,107,105,96,106,105,112,113,111,106,106,101,104,98,105,101,101,114,98,100,110,115,110,104,106,108,101,97,94,99,93,103,100,97,107,108,100,106,94,97,108,97,111,97,103,115,108,114,106,106,108,111,102,110,111,109,110,105,111,104,106,115,111,105,107,103,109,109,104,113,105,106,107,107,103,108,111,108,95,108,108,112,120,122,109,102,119,107,97,112,104,118,117,111,109,104,119,101,120,93,111,96,100,102,99,99,109,114,97,108,106,112,108,107,98,109,100,102,97,105,108,106,105,106,105,106,105,102,94,98,113,93,111,104,114,110,103,101,93,107,99,95,105,106,110,108,110,87,106,103,110,122,107,102,93,109,106,113,112,95,100,104,112,104,98,96,97,105,105,108,103,117,114,114,105,99,87,112,104,102,107,107,112,104,104,103,108,111,93,110,105,105,112,108,112,110,104,102,116,112,105,115,111,103,96,109,114,109,110,104,108,118,106,104,104,114,97,93,103,109,107,109,120,114,111,101,97,116,112,116,103,113,109,115,111,103,106,104,108,107,110,98,102,102,114,95,100,104,99,106,116,112,104,105,104,108,107,102,101,106,93,101,110,115,109,109,108,98,105,110,101,96,100,110,103,110,96,115,120,109,112,101,109,103,89,106,112,98,106,113,101,117,105,105,104,106,100,110,99,108,104,111,96,109,91,109,103,105,108,106,105,109,106,119,99,101,106,104,113,103,97,110,103,103,105,96,110,104,93,114,116,98,107,100,110,120,107,113,111,103,110,106,106,95,109,102,106,108,114,109,100,113,112,105,114,113,107,111,112,112,111,109,120,105,107,96,106,106,102,98,107,102,100,109,102,113,102,102,101,111,108,104,110,113,100,117,118,105,97,102,101,104,105,99,104,104,107,103,111,104,101,102,110,112,97,107,109,113,108,109,107,109,98,99,115,109,98,106,106,108,99,102,102,98,99,108,105,105,103,102,108,104,98,105,103,102,102,112,103,104,104,101,97,111,108,108,107,107,103,95,105,105,106,104,102,111,100,98,104,110,100,96,101,100,97,107,102,107,99,98,105,101,98,97,99,103,99,92,95,99,102,101,99,110,97,97,99,101,107,98,99,97,99,100,99,93,104,97,102,99,93,99,109,99,102,95,106,93,88,97,94,97,99,99,103,97,91,94,100,96,91,98,92,99,98,97,95,95,95,99,101,93,94,93,95,99,89,95,92,85,91,84,95,94],"mode":"lines+markers","hovertemplate":["Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>"],"type":"scatter","name":"kyoto","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1894,1895,1896,1897,1898,1899,1900,1901,1902,1903,1904,1905,1906,1907,1908,1909,1910,1911,1912,1913,1914,1915,1916,1917,1918,1919,1920,1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,1933,1934,1935,1936,1937,1938,1939,1940,1941,1942,1943,1944,1945,1946,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"y":[106,107,107,86,106,93,114,113,102,86,104,102,103,105,119,109,105,107,86,90,99,117,97,124,103,112,90,92,111,98,115,104,99,108,105,122,109,116,120,112,106,106,100,101,91,105,112,116,114,102,109,92,96,107,88,107,100,108,102,96,116,116,118,84,115,92,94,79,115,114,107,102,98,94,103,113,114,107,97,119,92,108,102,80,108,105,104,92,108,101,110,106,121,112,108,87,75,94,102,101,82,93,109,81,90,94,92,89,77,92,92,95,111,94,89,100,98,90,93,107,84,101,97,85,98,86,77,87,85,88,80,86],"mode":"lines+markers","hovertemplate":["Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>"],"type":"scatter","name":"liestal","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2024,2025],"y":[88,94],"mode":"lines+markers","hovertemplate":["Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>"],"type":"scatter","name":"newyorkcity","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2022,2023,2024,2025],"y":[86,96,83,93],"mode":"lines+markers","hovertemplate":["Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>"],"type":"scatter","name":"vancouver","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1921,1922,1923,1924,1925,1926,1927,1928,1929,1930,1931,1932,1933,1934,1935,1936,1937,1938,1939,1940,1941,1942,1943,1944,1945,1946,1947,1948,1949,1950,1951,1952,1953,1954,1955,1956,1957,1958,1959,1960,1961,1962,1963,1964,1965,1966,1967,1968,1969,1970,1971,1972,1973,1974,1975,1976,1977,1978,1979,1980,1981,1982,1983,1984,1985,1986,1987,1988,1989,1990,1991,1992,1993,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],"y":[79,97,99,104,86,101,79,99,90,91,101,106,99,105,91,98,104,84,89,104,102,95,94,100,79,82,102,88,88,99,96,100,86,96,92,97,98,108,96,105,92,97,93,102,105,95,96,90,99,106,98,102,101,93,93,83,85,102,92,97,93,97,97,94,97,92,87,91,88,74,88,98,101,95,92,95,85,86,95,77,96,92,92,91,99,89,91,86,91,90,88,80,99,100,100,85,84,95,91,80,87,80,82,77,87],"mode":"lines+markers","hovertemplate":["Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>","Location: %{fullData.name}<br>Year: %{x}<br>DOY: %{y}<extra><\/extra>"],"type":"scatter","name":"washingtondc","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["structure(function (x) ","{","    UseMethod(\"year\")","}, apiSrc = TRUE)"],"y":[88,88,88,88,88],"mode":"markers","hovertemplate":["Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>"],"type":"scatter","marker":{"color":"rgba(102,194,165,1)","size":11,"symbol":"diamond","line":{"color":"rgba(102,194,165,1)"}},"error_y":{"color":"rgba(102,194,165,1)","type":"data","symmetric":false,"array":[9],"arrayminus":[9]},"showlegend":false,"name":"kyoto","textfont":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["structure(function (x) ","{","    UseMethod(\"year\")","}, apiSrc = TRUE)"],"y":[86,86,86,86,86],"mode":"markers","hovertemplate":["Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>"],"type":"scatter","marker":{"color":"rgba(252,141,98,1)","size":11,"symbol":"diamond","line":{"color":"rgba(252,141,98,1)"}},"error_y":{"color":"rgba(252,141,98,1)","type":"data","symmetric":false,"array":[9],"arrayminus":[8]},"showlegend":false,"name":"liestal","textfont":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["structure(function (x) ","{","    UseMethod(\"year\")","}, apiSrc = TRUE)"],"y":[92,92,92,92,92],"mode":"markers","hovertemplate":["Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>"],"type":"scatter","marker":{"color":"rgba(141,160,203,1)","size":11,"symbol":"diamond","line":{"color":"rgba(141,160,203,1)"}},"error_y":{"color":"rgba(141,160,203,1)","type":"data","symmetric":false,"array":[7],"arrayminus":[8]},"showlegend":false,"name":"newyorkcity","textfont":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["structure(function (x) ","{","    UseMethod(\"year\")","}, apiSrc = TRUE)"],"y":[90,90,90,90,90],"mode":"markers","hovertemplate":["Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>"],"type":"scatter","marker":{"color":"rgba(231,138,195,1)","size":11,"symbol":"diamond","line":{"color":"rgba(231,138,195,1)"}},"error_y":{"color":"rgba(231,138,195,1)","type":"data","symmetric":false,"array":[10],"arrayminus":[10]},"showlegend":false,"name":"vancouver","textfont":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"xaxis":"x","yaxis":"y","frame":null},{"x":["structure(function (x) ","{","    UseMethod(\"year\")","}, apiSrc = TRUE)"],"y":[84,84,84,84,84],"mode":"markers","hovertemplate":["Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>","Location: %{fullData.name}<br>2026 Pred: %{y}<br>Interval: %{customdata[1]}-%{customdata[2]}<extra><\/extra>"],"type":"scatter","marker":{"color":"rgba(166,216,84,1)","size":11,"symbol":"diamond","line":{"color":"rgba(166,216,84,1)"}},"error_y":{"color":"rgba(166,216,84,1)","type":"data","symmetric":false,"array":[7],"arrayminus":[8]},"showlegend":false,"name":"washingtondc","textfont":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="plotly html-widget html-fill-item html-fill-container" id="htmlwidget-3b720fe0061c77249d48" style="width:100%;height:406px;"></div>
+<script type="application/json" data-for="htmlwidget-3b720fe0061c77249d48">{"x":{"visdat":{"16684578b5e22":["function () ","plotlyVisDat"]},"cur_data":"16684578b5e22","attrs":{"16684578b5e22":{"mode":"markers+text","lon":{},"lat":{},"text":{},"textposition":"top center","marker":{"size":14,"color":{},"colorscale":"RdYlBu","reversescale":true,"colorbar":{"title":"Pred DOY"}},"hovertemplate":"<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>","customdata":{},"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scattergeo"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"2026 Forecasts Across the Five Competition Sites","geo":{"showland":true,"landcolor":"rgb(243,243,243)","showcountries":true},"hovermode":"closest","showlegend":false},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"mode":"markers+text","lon":[135.67611350000001,7.7305190000000001,-73.998090000000005,-123.1636,-77.0386278],"lat":[35.011983100000002,47.481400000000001,40.730400000000003,49.223700000000001,38.885349599999998],"text":["kyoto","liestal","newyorkcity","vancouver","washingtondc"],"textposition":["top center","top center","top center","top center","top center"],"marker":{"color":[88,86,92,90,84],"size":14,"colorscale":"RdYlBu","reversescale":true,"colorbar":{"title":"Pred DOY"},"line":{"color":"rgba(31,119,180,1)"}},"hovertemplate":["<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>","<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>","<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>","<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>","<b>%{text}<\/b><br> Prediction: %{marker.color}<br> Interval: %{customdata[1]} to %{customdata[2]}<br> Predicted date: %{customdata[3]}<extra><\/extra>"],"type":"scattergeo","line":{"color":"rgba(31,119,180,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
+<div class="card cell bslib-card html-fill-container" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<div class="cell-output-display html-fill-item html-fill-container">
+<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-be14745266135a5e73e6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-be14745266135a5e73e6">{"x":{"filter":"none","vertical":false,"caption":"<caption>Linear trend slope shown as DOY change per decade (negative = earlier bloom)<\/caption>","data":[["kyoto","liestal","newyorkcity","vancouver","washingtondc"],[837,132,2,4,105],[812,1894,2024,2022,1921],[2025,2025,2025,2025,2025],[-0.02,-1.19,60,8,-0.83],["Earlier bloom trend","Earlier bloom trend","Later bloom trend","Later bloom trend","Earlier bloom trend"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>location<\/th>\n      <th>n_years<\/th>\n      <th>first_year<\/th>\n      <th>last_year<\/th>\n      <th>slope_per_decade<\/th>\n      <th>interpretation<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"bPaginate":false,"dom":"ifrt","language":{"info":"Showing _TOTAL_ entries"},"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"name":"location","targets":0},{"name":"n_years","targets":1},{"name":"first_year","targets":2},{"name":"last_year","targets":3},{"name":"slope_per_decade","targets":4},{"name":"interpretation","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="card bslib-card html-fill-container" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<p>This dashboard is fully reproducible from:</p>
+<ul>
+<li><code>data/*.csv</code></li>
+<li><code>cherry-predictions.csv</code></li>
+<li><code>cherry-predictions-python.csv</code></li>
+<li><code>cherry-predictions-final.csv</code></li>
+</ul>
+<p>To refresh after model updates, run:</p>
+<div class="sourceCode html-fill-item html-fill-container" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render solution.qmd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> nbconvert <span class="at">--to</span> notebook <span class="at">--execute</span> Solution.ipynb <span class="at">--inplace</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render dashboard.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div>
+</div>
+<div class="bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr);
+grid-auto-rows: minmax(0, 1fr);">
+<div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="card bslib-card html-fill-container" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<ul>
+<li><a href="cherry-predictions-final.csv">Download final submission CSV</a></li>
+<li><a href="cherry-predictions.csv">Download R pipeline submission CSV</a></li>
+<li><a href="cherry-predictions-python.csv">Download Python pipeline submission CSV</a></li>
+<li><a href="dashboard.html">Open rendered dashboard HTML</a></li>
+</ul>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</div><div class="bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content); grid-auto-columns: minmax(0, 1fr);">
+<div class="card bslib-card html-fill-container" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
+<div class="card-body html-fill-item html-fill-container">
+<ul>
+<li>Plotly charts support the built-in camera icon to export static PNG snapshots.</li>
+<li>Use your browser print dialog (<code>Cmd+P</code>) on <code>dashboard.html</code> to save a PDF report.</li>
+<li>Re-run data and refresh assets before exporting:</li>
+</ul>
+<div class="sourceCode html-fill-item html-fill-container" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render solution.qmd</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">jupyter</span> nbconvert <span class="at">--to</span> notebook <span class="at">--execute</span> Solution.ipynb <span class="at">--inplace</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render dashboard.qmd</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
+    <template>Expand</template>
+    <span class="bslib-full-screen-enter badge rounded-pill">
+        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
+    </span>
+</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden">
+
+</div>
+</div>
+</div>
+</div>
+
+
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /container fluid -->
+
+<script type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (_event) {
+  if (window.bslib.Card) {
+    window.bslib.Card.initializeAllCards();
+  }
+}); 
+</script>
+  
+
+
+
+</body></html>
