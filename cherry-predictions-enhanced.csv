@@ -1,0 +1,6 @@
+location,prediction,lower,upper
+kyoto,94,88,100
+liestal,95,90,100
+newyorkcity,98,92,103
+vancouver,95,83,108
+washingtondc,89,83,96
