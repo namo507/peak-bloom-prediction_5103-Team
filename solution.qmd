@@ -11,60 +11,28 @@ execute:
 
 ## Abstract
 
-Cherry blossom bloom timing is a sensitive phenological indicator of climate
-change, yet accurate annual prediction remains difficult because bloom dates
-emerge from complex, nonlinear interactions among geography, long-term warming
-trends, and stochastic weather variability.  We present an interpretable
-two-model ensemble that exploits complementary information scales.
+Cherry blossom bloom timing is a sensitive phenological indicator of climate change, yet accurate annual prediction remains difficult because bloom dates emerge from complex, nonlinear interactions among geography, long-term warming trends, and stochastic weather variability. We present an interpretable two-model ensemble that exploits complementary information scales.
 
-**Model A** captures site-specific momentum through a recency-weighted quadratic
-trend fitted independently to each of the five competition locations (Kyoto,
-Washington D.C., Liestal, Vancouver, New York City).  Exponential decay
-weights (half-life ≈ 6 years) let recent climate shifts dominate the local
-signal while retaining curvature from longer records—particularly valuable for
-Kyoto's 800+ year series and Washington D.C.'s century of data.
+**Model A** captures site-specific momentum through a recency-weighted quadratic trend fitted independently to each of the five competition locations (Kyoto, Washington D.C., Liestal, Vancouver, New York City). Exponential decay weights (half-life ≈ 6 years) let recent climate shifts dominate the local signal while retaining curvature from longer records—particularly valuable for Kyoto's 800+ year series and Washington D.C.'s century of data.
 
-**Model B** learns shared cross-site structure via a pooled Generalized Additive
-Model (GAM) with smooth terms for calendar year, latitude–longitude
-interaction, altitude, and per-site observation depth.  This model is trained
-on competition data augmented with three auxiliary time series (Japan regional
-bloom dates, MeteoSwiss Swiss-wide phenology, and South Korean cherry records)
-plus both USA-NPN data products—status-intensity observations and individual
-phenometrics—for the New York City site (Washington Square Park, Site 32789,
-species 228).  The auxiliary data broadens geographic and temporal coverage,
-helping the GAM generalize across hemispheres and altitudes.
+**Model B** learns shared cross-site structure via a pooled Generalized Additive Model (GAM) with smooth terms for calendar year, latitude–longitude interaction, altitude, and per-site observation depth. This model is trained on competition data augmented with three auxiliary time series (Japan regional bloom dates, MeteoSwiss Swiss-wide phenology, and South Korean cherry records) plus both USA-NPN data products—status-intensity observations and individual phenometrics—for the New York City site (Washington Square Park, Site 32789, species 228). The auxiliary data broadens geographic and temporal coverage, helping the GAM generalize across hemispheres and altitudes.
 
-**Ensemble blending** is data-driven: a rolling-origin backtest (validation
-windows from 1900 to the latest observed year) produces out-of-sample
-predictions for both models at each site.  Inverse-MAE weights, computed
-globally over this backtest, determine the final blend ratio—giving more
-influence to whichever model performs better on held-out years.
+**Ensemble blending** is data-driven: a rolling-origin backtest (validation windows from 1900 to the latest observed year) produces out-of-sample predictions for both models at each site. Inverse-MAE weights, computed globally over this backtest, determine the final blend ratio—giving more influence to whichever model performs better on held-out years.
 
-**Prediction intervals** are calibrated using split-conformal principles.  For
-each location, we take the 90th percentile of the backtest absolute residuals
-as the half-width, producing intervals that are tight enough to win on the
-sum-of-squared-widths tiebreaker while maintaining ≥90% empirical coverage.
+**Prediction intervals** are calibrated using split-conformal principles. For each location, we take the 90th percentile of the backtest absolute residuals as the half-width, producing intervals that are tight enough to win on the sum-of-squared-widths tiebreaker while maintaining ≥90% empirical coverage.
 
-A parallel Python implementation (Gradient Boosting Regressor in place of the
-GAM) provides an independent second opinion.  When the two pipelines agree
-within 4 days on average, we submit a blended point prediction and averaged
-interval bounds; otherwise we default to the R pipeline.  This cross-language
-ensemble guard reduces model-specific overfitting risk.
+A parallel Python implementation (Gradient Boosting Regressor in place of the GAM) provides an independent second opinion. When the two pipelines agree within 4 days on average, we submit a blended point prediction and averaged interval bounds; otherwise we default to the R pipeline. This cross-language ensemble guard reduces model-specific overfitting risk.
 
-Key features include latitude, longitude, altitude (log-transformed), calendar
-year (centered and squared), observation-count depth per site, and data-source
-identity.  No proprietary or future-looking data are used; all inputs are
-publicly available.  The Quarto document is fully self-contained and
-reproducible.
+Key features include latitude, longitude, altitude (log-transformed), calendar year (centered and squared), observation-count depth per site, and data-source identity. No proprietary or future-looking data are used; all inputs are publicly available. The Quarto document is fully self-contained and reproducible.
 
 ## Goal
 
 This notebook builds a competition-focused ensemble for the next unseen year:
 
-- `Model A`: site-level recency-weighted trend (strong for long local histories).
-- `Model B`: pooled nonlinear GAM using geography + time + all auxiliary datasets.
-- `Ensemble`: inverse-MAE weighted blend from rolling-origin backtesting.
-- `Intervals`: location-wise conformal residual quantiles from backtests.
+-   `Model A`: site-level recency-weighted trend (strong for long local histories).
+-   `Model B`: pooled nonlinear GAM using geography + time + NOAA climate covariates.
+-   `Ensemble`: site-wise dynamic weighted blend from rolling-origin backtesting.
+-   `Intervals`: location-wise conformal residual quantiles from backtests.
 
 ## Submission preview
 
@@ -114,15 +82,18 @@ if (file.exists(preview_file)) {
 
 ```{r}
 #| label: setup
-required_pkgs <- c("tidyverse", "lubridate", "mgcv")
+required_pkgs <- c("tidyverse", "lubridate", "mgcv", "httr2", "jsonlite")
 missing_pkgs <- required_pkgs[!vapply(required_pkgs, requireNamespace, logical(1), quietly = TRUE)]
 if (length(missing_pkgs) > 0) {
+  options(repos = c(CRAN = "https://cloud.r-project.org"))
   install.packages(missing_pkgs)
 }
 
 library(tidyverse)
 library(lubridate)
 library(mgcv)
+library(httr2)
+library(jsonlite)
 
 set.seed(5103)
 options(dplyr.summarise.inform = FALSE)
@@ -213,6 +184,103 @@ target_year <- max(competition_raw$year, na.rm = TRUE) + 1
 
 all_data |>
   count(source, name = "rows")
+
+# NOAA climate covariates (dataset metadata: https://www.ncdc.noaa.gov/cdo-web/datasets)
+NOAA_API_BASE_URL <- "https://www.ncei.noaa.gov/cdo-web/api/v2/data"
+NOAA_WEB_API_TOKEN <- Sys.getenv("NOAA_WEB_API_TOKEN")
+
+stations <- tibble::tribble(
+  ~location,       ~station_id,
+  "washingtondc", "GHCND:USW00013743",
+  "vancouver",    "GHCND:CA001108395",
+  "newyorkcity",  "GHCND:USW00014732",
+  "liestal",      "GHCND:SZ000001940",
+  "kyoto",        "GHCND:JA000047759"
+)
+
+get_noaa_daily <- function(station_id, start_date, end_date, token) {
+  if (!nzchar(token)) return(tibble())
+  out <- list()
+  windows <- seq(as_date(start_date), as_date(end_date), by = "300 days")
+  if (length(windows) <= 1) windows <- c(as_date(start_date), as_date(end_date) + days(1))
+  for (i in seq_len(length(windows) - 1)) {
+    from <- windows[i]
+    to <- min(windows[i + 1] - days(1), as_date(end_date))
+    resp <- tryCatch(
+      request(NOAA_API_BASE_URL) |>
+        req_headers(token = token) |>
+        req_url_query(
+          datasetid = "GHCND",
+          stationid = station_id,
+          datatypeid = "TAVG,TMAX",
+          startdate = as.character(from),
+          enddate = as.character(to),
+          units = "metric",
+          limit = 1000
+        ) |>
+        req_retry(max_tries = 5) |>
+        req_perform() |>
+        resp_body_json(),
+      error = function(e) NULL
+    )
+    if (!is.null(resp$results)) {
+      out[[length(out) + 1]] <- tibble::as_tibble(resp$results)
+    }
+  }
+  bind_rows(out)
+}
+
+build_noaa_features <- function(force_refresh = FALSE, cache_file = "data/noaa_features.csv") {
+  if (!force_refresh && file.exists(cache_file)) {
+    return(read_csv(cache_file, show_col_types = FALSE))
+  }
+
+  if (!nzchar(NOAA_WEB_API_TOKEN)) {
+    message("NOAA_WEB_API_TOKEN not found. Using cached climate features if available.")
+    return(tibble(location = character(), year = integer(),
+                  winter_tavg = numeric(), spring_tavg = numeric(), gdd_proxy = numeric()))
+  }
+
+  start_year <- max(1880, min(all_data$year, na.rm = TRUE) - 1)
+  end_year <- max(all_data$year, na.rm = TRUE)
+
+  raw <- stations |>
+    group_by(location, station_id) |>
+    group_modify(\(x, g) {
+      get_noaa_daily(g$station_id, sprintf("%d-01-01", start_year), sprintf("%d-12-31", end_year), NOAA_WEB_API_TOKEN) |>
+        mutate(location = g$location)
+    }) |>
+    ungroup()
+
+  if (nrow(raw) == 0) {
+    return(tibble(location = character(), year = integer(),
+                  winter_tavg = numeric(), spring_tavg = numeric(), gdd_proxy = numeric()))
+  }
+
+  feat <- raw |>
+    filter(datatype %in% c("TAVG", "TMAX")) |>
+    mutate(
+      date = as_date(date),
+      value = as.numeric(value),
+      value = if_else(abs(value) > 80, value / 10, value),
+      target_year = if_else(month(date) == 12, year(date) + 1L, year(date)),
+      in_winter = month(date) %in% c(12, 1, 2),
+      in_spring = month(date) %in% c(2, 3)
+    ) |>
+    group_by(location, year = target_year) |>
+    summarize(
+      winter_tavg = mean(value[in_winter & datatype == "TAVG"], na.rm = TRUE),
+      spring_tavg = mean(value[in_spring & datatype == "TAVG"], na.rm = TRUE),
+      gdd_proxy = sum(pmax(value[month(date) %in% c(1, 2, 3) & datatype == "TAVG"] - 5, 0), na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    mutate(across(c(winter_tavg, spring_tavg, gdd_proxy), ~ ifelse(is.nan(.x), NA_real_, .x)))
+
+  write_csv(feat, cache_file)
+  feat
+}
+
+climate_features <- build_noaa_features(force_refresh = FALSE)
 ```
 
 ## Feature engineering
@@ -223,15 +291,39 @@ add_features <- function(df, reference_df = NULL) {
   site_n <- ref |>
     count(site_id, name = "site_obs")
 
+  climate_cols <- c("winter_tavg", "spring_tavg", "gdd_proxy")
+  for (nm in climate_cols) {
+    if (!nm %in% names(df)) df[[nm]] <- NA_real_
+    if (!nm %in% names(ref)) ref[[nm]] <- NA_real_
+  }
+
+  location_clim <- ref |>
+    group_by(location) |>
+    summarize(
+      winter_tavg_loc = suppressWarnings(median(winter_tavg, na.rm = TRUE)),
+      spring_tavg_loc = suppressWarnings(median(spring_tavg, na.rm = TRUE)),
+      gdd_proxy_loc = suppressWarnings(median(gdd_proxy, na.rm = TRUE)),
+      .groups = "drop"
+    ) |>
+    mutate(across(ends_with("_loc"), ~ ifelse(is.infinite(.x), NA_real_, .x)))
+
+  g_winter <- suppressWarnings(median(ref$winter_tavg, na.rm = TRUE)); if (!is.finite(g_winter)) g_winter <- 0
+  g_spring <- suppressWarnings(median(ref$spring_tavg, na.rm = TRUE)); if (!is.finite(g_spring)) g_spring <- 0
+  g_gdd <- suppressWarnings(median(ref$gdd_proxy, na.rm = TRUE)); if (!is.finite(g_gdd)) g_gdd <- 0
+
   df |>
     left_join(site_n, by = "site_id") |>
+    left_join(location_clim, by = "location") |>
     mutate(
       year_c = year - 1950,
       year_c2 = year_c^2,
       decade = floor(year / 10) * 10,
       lat_abs = abs(lat),
       alt_log1p = log1p(pmax(alt, 0)),
-      site_obs = replace_na(site_obs, 1)
+      site_obs = replace_na(site_obs, 1),
+      winter_tavg = coalesce(winter_tavg, winter_tavg_loc, g_winter),
+      spring_tavg = coalesce(spring_tavg, spring_tavg_loc, g_spring),
+      gdd_proxy = coalesce(gdd_proxy, gdd_proxy_loc, g_gdd)
     )
 }
 ```
@@ -269,16 +361,30 @@ predict_local_trend <- function(train_comp, new_comp) {
 }
 
 fit_gam_model <- function(train_all) {
-  mgcv::gam(
-    bloom_doy ~
-      s(year, k = 25, bs = "cr") +
-      s(lat, long, k = 40, bs = "tp") +
-      s(alt_log1p, k = 8, bs = "cr") +
-      s(site_obs, k = 8, bs = "cr") +
-      source,
-    data = train_all,
-    method = "REML"
+  term_for_climate <- function(var_name) {
+    uniq <- n_distinct(train_all[[var_name]])
+    if (is.na(uniq) || uniq < 5) {
+      var_name
+    } else {
+      k_val <- min(8, uniq - 1)
+      paste0("s(", var_name, ", k = ", k_val, ", bs = 'cr')")
+    }
+  }
+
+  rhs_terms <- c(
+    "s(year, k = 25, bs = 'cr')",
+    "s(lat, long, k = 40, bs = 'tp')",
+    "s(alt_log1p, k = 8, bs = 'cr')",
+    "s(site_obs, k = 8, bs = 'cr')",
+    term_for_climate("winter_tavg"),
+    term_for_climate("spring_tavg"),
+    term_for_climate("gdd_proxy"),
+    "source"
   )
+
+  model_formula <- as.formula(paste("bloom_doy ~", paste(rhs_terms, collapse = " + ")))
+
+  mgcv::gam(model_formula, data = train_all, method = "REML")
 }
 ```
 
@@ -300,11 +406,13 @@ rolling_results <- map_dfr(backtest_years, function(y) {
 
   train_all <- all_data |>
     filter(year < y) |>
+    left_join(climate_features, by = c("location", "year")) |>
     add_features()
 
   test_comp_feat <- test_comp |>
     mutate(source = factor("competition", levels = levels(all_data$source)),
            site_id = paste(source, location, sep = "::")) |>
+    left_join(climate_features, by = c("location", "year")) |>
     add_features(reference_df = train_all)
 
   local_pred <- predict_local_trend(train_comp, test_comp_feat)
@@ -325,12 +433,37 @@ rolling_results <- map_dfr(backtest_years, function(y) {
 mae_local <- mean(abs(rolling_results$bloom_doy - rolling_results$pred_local), na.rm = TRUE)
 mae_gam <- mean(abs(rolling_results$bloom_doy - rolling_results$pred_gam), na.rm = TRUE)
 
-w_local <- (1 / mae_local) / ((1 / mae_local) + (1 / mae_gam))
-w_gam <- 1 - w_local
+w_grid <- seq(0, 1, by = 0.02)
+global_weight_tbl <- tibble(w_local = w_grid) |>
+  mutate(mae = map_dbl(w_local, \(w) {
+    mean(abs(rolling_results$bloom_doy - (w * rolling_results$pred_local + (1 - w) * rolling_results$pred_gam)), na.rm = TRUE)
+  })) |>
+  arrange(mae)
+
+w_local_global <- global_weight_tbl$w_local[[1]]
+w_gam_global <- 1 - w_local_global
+
+site_weights <- rolling_results |>
+  group_split(location) |>
+  map_dfr(\(df) {
+    loc <- unique(df$location)[1]
+    tibble(w_local = w_grid) |>
+      mutate(mae = map_dbl(w_local, \(w) {
+        mean(abs(df$bloom_doy - (w * df$pred_local + (1 - w) * df$pred_gam)), na.rm = TRUE)
+      })) |>
+      slice_min(mae, n = 1, with_ties = FALSE) |>
+      transmute(location = loc, w_local, w_gam = 1 - w_local)
+  })
 
 rolling_results <- rolling_results |>
-  mutate(pred_ensemble = w_local * pred_local + w_gam * pred_gam,
+  left_join(site_weights, by = "location") |>
+  mutate(
+    w_local = replace_na(w_local, w_local_global),
+    w_gam = replace_na(w_gam, w_gam_global),
+    pred_ensemble = w_local * pred_local + w_gam * pred_gam,
          abs_err = abs(bloom_doy - pred_ensemble))
+
+mae_ensemble <- mean(abs(rolling_results$bloom_doy - rolling_results$pred_ensemble), na.rm = TRUE)
 
 site_q90 <- rolling_results |>
   group_by(location) |>
@@ -341,13 +474,15 @@ global_q90 <- quantile(rolling_results$abs_err, probs = 0.90, na.rm = TRUE, type
 tibble(model = c("local", "gam", "ensemble"),
        mae = c(mae_local,
                mae_gam,
-               mean(abs(rolling_results$bloom_doy - rolling_results$pred_ensemble), na.rm = TRUE)))
+         mae_ensemble))
 ```
 
 ## Final fit and next-year prediction
 
 ```{r}
-train_all <- add_features(all_data)
+train_all <- all_data |>
+  left_join(climate_features, by = c("location", "year")) |>
+  add_features()
 train_comp <- competition
 
 newdata <- competition_raw |>
@@ -364,6 +499,7 @@ newdata <- competition_raw |>
     bloom_doy = NA_real_,
     site_id = paste(source, location, sep = "::")
   ) |>
+  left_join(climate_features, by = c("location", "year")) |>
   add_features(reference_df = train_all)
 
 local_pred <- predict_local_trend(train_comp, newdata)
@@ -378,6 +514,12 @@ final_pred <- newdata |>
             by = c("location", "year")) |>
   mutate(
     pred_gam = as.numeric(gam_pred),
+    prediction = pred_gam
+  ) |>
+  left_join(site_weights, by = "location") |>
+  mutate(
+    w_local = replace_na(w_local, w_local_global),
+    w_gam = replace_na(w_gam, w_gam_global),
     prediction = w_local * pred_local + w_gam * pred_gam
   ) |>
   left_join(site_q90, by = "location") |>

@@ -1,6 +1,6 @@
 location,prediction,lower,upper
-kyoto,92,83,101
+kyoto,91,83,98
 liestal,87,79,95
-newyorkcity,92,85,99
-vancouver,93,79,107
-washingtondc,84,77,91
+newyorkcity,89,82,95
+vancouver,90,82,99
+washingtondc,84,76,92
