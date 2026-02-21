@@ -1,6 +1,7 @@
 ---
 title: "Cherry Blossom Peak Bloom Prediction 2026"
-subtitle: "Team 5103 — University of Maryland"
+author: "Team 5103"
+subtitle: "University of Maryland"
 format:
   revealjs:
     theme: [simple, custom.scss]
@@ -103,9 +104,7 @@ site_trends <- site_trends |> left_join(recent_slopes, by="location")
 ## Datasets {.smaller}
 
 :::: {.columns}
-::: {.column width="50%"}
-
-**5 Competition sites**
+::: {.column width="55%"}
 
 | Site | Records | Span |
 |---|---:|---|
@@ -115,38 +114,25 @@ site_trends <- site_trends |> left_join(recent_slopes, by="location")
 | Vancouver | `r comp_raw|>filter(location=="vancouver")|>nrow()` | 2022–2025 |
 | New York City | `r comp_raw|>filter(location=="newyorkcity")|>nrow()` | 2019–2025 |
 
-**3 Auxiliary sources:** Japan regional (6,573), MeteoSwiss (6,642), South Korea (994)
+**Auxiliary:** Japan (6,573), MeteoSwiss (6,642), South Korea (994)
 
-**USA-NPN enrichment** — `r nrow(nyc_extra)` extra NYC records from Washington Square Park citizen-science observations (species 228, phenophase 501)
+**NYC enrichment:** `r nrow(nyc_extra)` citizen-science records (USA-NPN)
 
 **Total:** `r format(nrow(all_data), big.mark=",")` bloom records
 
 :::
-::: {.column width="50%"}
+::: {.column width="45%"}
 
-**Enhanced features** (from master dataset + NOAA CDO)
+**Key features**
 
-| Feature | Type |
+| Feature | Role |
 |---|---|
-| Winter / Spring mean temp | Meteorological |
-| GDD Jan-Feb, GDD winter | Thermal accumulation |
-| Chill hours (winter, Nov-Dec) | Dormancy requirement |
-| ONI, NAO, PDO indices | Macro-climate |
-| Hopkins bioclimatic index | Phenological |
-| Photoperiod (Mar 20) | Astronomical |
-| Lat, Long, Alt (log) | Geographic |
-| Year (centered + quadratic) | Temporal trend |
+| Winter mean temperature | Primary bloom driver |
+| Spring mean temperature | Accumulation trigger |
+| Latitude, longitude, altitude | Geographic baseline |
+| Year (trend) | Long-term shift |
 
-```{r}
-#| fig-width: 4.5
-#| fig-height: 2.5
-all_data |> count(source) |>
-  ggplot(aes(reorder(source,-n), n, fill=source)) +
-  geom_col(show.legend=FALSE, alpha=0.8) +
-  geom_text(aes(label=format(n,big.mark=",")), vjust=-0.3, size=3) +
-  labs(x=NULL,y="Records") + theme_minimal(base_size=10) +
-  scale_y_continuous(expand=expansion(mult=c(0,0.15)))
-```
+Winter/spring temperature is the **dominant predictor** — warmer winters and earlier spring warmth directly accelerate bloom timing.
 
 :::
 ::::
@@ -160,42 +146,39 @@ all_data |> count(source) |>
 
 **Model A — Local Trend** (per site)
 
-- Recency-weighted quadratic: `bloom_doy ~ year + year²`
-- Exponential decay weights: $w_i = e^{(i-n)/6}$, half-life ≈ 6 yr
-- Captures site-specific momentum from long local histories
+- Weighted quadratic regression on year
+- Recent years weighted more heavily (exponential decay, ~6 yr half-life)
+- Captures site-specific long-term bloom shift
 
-**Model B — Pooled GAM** (R pipeline)
+**Model B — Pooled GAM** (R)
 
-$$\text{DOY} \sim s(\text{year}) + s(\text{lat}, \text{long}) + s(\text{alt}) + s(\text{obs}) + \text{climate} + \text{source}$$
+- Smooth functions of year, location, altitude over `r format(nrow(all_data), big.mark=",")` records
+- Winter/spring temperature as key covariate
 
-- REML on `r format(nrow(all_data), big.mark=",")` records
-- NOAA CDO covariates: winter/spring temp, GDD proxy
+**Model B′ — Gradient Boosted Trees** (Python)
 
-**Model B′ — Gradient Boosted Trees** (Python pipeline)
-
-- GBR with Huber loss, 800 trees, lr = 0.015
-- Enhanced features: GDD, chill hours, ONI/NAO/PDO, Hopkins index
-- Stochastic boosting (subsample=0.8, max_features=√p)
+- 800 trees with robust loss
+- Same temperature-based features
 
 :::
 ::: {.column width="50%"}
 
 **Ensemble blending**
 
-- Rolling-origin backtest (1900–2025, ~126 windows)
-- **Site-specific** optimal weights via grid search (w ∈ [0, 1] by 0.02)
-- Sites with deep history → heavier Model A; sparse sites → Model B
+- Backtest over 126 rolling windows (1900–2025)
+- Per-site optimal weight between local and global models
+- Deep-history sites lean on Model A; sparse sites lean on Model B
 
 **Prediction intervals**
 
-- Split-conformal: 90th percentile of backtest |residuals| per site
-- ≥90% empirical coverage, tight enough for SSW tiebreaker
+- Conformal method: 90th percentile of backtest residuals per site
+- ≥90% coverage with tight widths for SSW tiebreaker
 
-**Cross-language guard**
+**Cross-language check**
 
-- R (GAM) and Python (GBR) run independently
-- If avg gap ≤ 4 days → blend both; else default to R
-- Current gap: **`r round(avg_gap, 1)` days** → blended
+- R and Python pipelines run independently
+- Averaged when predictions agree within 4 days
+- Current agreement: **`r round(avg_gap, 1)` days**
 
 :::
 ::::
@@ -207,21 +190,20 @@ $$\text{DOY} \sim s(\text{year}) + s(\text{lat}, \text{long}) + s(\text{alt}) + 
 :::: {.columns}
 ::: {.column width="50%"}
 
-**Backtest MAE comparison**
+**Model accuracy (MAE in days)**
 
-| Model | MAE (days) | vs Baseline |
+| Model | MAE | Improvement |
 |---|---:|---|
 | Local trend only | 7.27 | — |
-| Baseline GAM ensemble | ~5.61 | — |
-| Enhanced global (GBR) | 4.52 | +19% |
-| **Enhanced ensemble** | **4.23** | **+25%** |
+| Baseline ensemble | ~5.61 | — |
+| Enhanced (temperature features) | 4.52 | 19% better |
+| **Final ensemble** | **4.23** | **25% better** |
 
-Key improvements:
+Why the improvement:
 
-- GDD + chill hours capture phenological drivers directly
-- Climate indices (ONI, NAO, PDO) explain year-to-year variability
-- Stochastic boosting + deeper trees capture complex interactions
-- Site-specific weights outperform global inverse-MAE
+- Winter/spring temperature captures the main phenological driver
+- Per-site blending weights adapt to each location's data depth
+- Cross-language averaging reduces individual model bias
 
 :::
 ::: {.column width="50%"}
@@ -229,16 +211,22 @@ Key improvements:
 ```{r}
 #| fig-width: 5
 #| fig-height: 4
-comp_raw |>
-  filter(year >= 1880) |>
-  ggplot(aes(year, bloom_doy, color = location)) +
-  geom_point(alpha = 0.4, size = 0.9) +
-  geom_smooth(method = "loess", span = 0.4, se = FALSE, linewidth = 0.7) +
-  facet_wrap(~location, scales = "free_x", ncol = 1) +
-  labs(title = "Bloom trending earlier at all sites",
-       x = "Year", y = "Bloom DOY") +
-  theme_minimal(base_size = 9) +
-  theme(legend.position = "none", strip.text = element_text(face = "bold"))
+final_sub |>
+  mutate(date_pred  = doy_to_date(target_year, prediction),
+         date_lower = doy_to_date(target_year, lower),
+         date_upper = doy_to_date(target_year, upper),
+         City = loc_names[location],
+         City = reorder(City, prediction)) |>
+  ggplot(aes(y = City)) +
+  geom_segment(aes(x = date_lower, xend = date_upper, yend = City),
+               linewidth = 6, color = "#F2A6B6", alpha = 0.7) +
+  geom_point(aes(x = date_pred), size = 5, color = "#C0392B") +
+  scale_x_date(date_labels = "%b %d") +
+  labs(title = "2026 Predictions with 90% Intervals",
+       subtitle = "Dot = prediction, bar = confidence interval",
+       x = "Date", y = NULL) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid.major.y = element_blank())
 ```
 
 :::
@@ -251,30 +239,30 @@ comp_raw |>
 :::: {.columns}
 ::: {.column width="50%"}
 
-### Global-scale drivers
+### Why bloom timing changes
 
-1. **Rising temperatures** — 1.1 °C warming since pre-industrial. Warmer winters reduce chill-hour needs; warmer springs accelerate GDD → bloom advances everywhere.
+- **Winter warming** — warmer winters mean trees need less cold exposure, starting spring development earlier
 
-2. **ENSO** — La Niña cools Pacific NW (delays Vancouver), milder Eastern US winters (advances DC/NYC). 2025-26 neutral transition → near-normal timing.
+- **Spring temperatures** — earlier warm spells accelerate bloom; late cold snaps can delay it
 
-3. **Latitude gradient** — ~1 DOY delay per degree N above 35°N. GAM's lat-long smooth captures this.
+- **Latitude** — ~1 day later per degree north above 35°N
 
-4. **Altitude penalty** — ~2 days later per 100 m elevation. Liestal (350 m) systematically later than sea-level sites.
+- **Altitude** — ~2 days later per 100 m elevation (Liestal at 350 m blooms latest)
 
 :::
 ::: {.column width="50%"}
 
-### Site-specific drivers
+### Site-specific notes
 
-- **Kyoto:** Urban heat island + `r round(abs(site_trends$slope[site_trends$location=="kyoto"]) * 100, 1)` d/century advancement. 1200-yr record stabilises local model.
+- **Kyoto:** Urban heat island + `r round(abs(site_trends$slope[site_trends$location=="kyoto"]) * 100, 1)` d/century earlier trend. 1200-yr record anchors predictions.
 
-- **Washington DC:** Tidal Basin thermal buffer → earliest bloomer. `r round(abs(site_trends$slope30[site_trends$location=="washingtondc"]) * 10, 1)` d/decade recent acceleration.
+- **Washington DC:** Tidal Basin warmth → earliest bloomer. `r round(abs(site_trends$slope30[site_trends$location=="washingtondc"]) * 10, 1)` d/decade recent acceleration.
 
-- **Liestal:** Alpine amplified warming (0.3 °C/decade). Foehn winds cause stochastic early bloom → widest variability.
+- **Liestal:** Alpine warming 0.3 °C/decade. Foehn winds add variability.
 
-- **Vancouver:** PDO phase modulates decadal variability. Maritime buffering keeps volatility moderate.
+- **Vancouver:** Maritime climate buffers extremes. Only 4 years of data → wider intervals.
 
-- **NYC:** Shortest record (12 yrs) → highest uncertainty. Continental cold snaps reset GDD accumulation. NPN data fusion reduces LOO MAE by ~1.5 days.
+- **NYC:** Short record (`r site_trends$n[site_trends$location=="newyorkcity"]` yrs). NPN citizen-science data reduces error ~1.5 days.
 
 :::
 ::::
@@ -304,35 +292,20 @@ final_sub |>
 
 | Metric | Value |
 |---|---:|
-| Backtest MAE (enhanced) | **4.23 days** |
-| R vs Python gap | `r round(avg_gap, 1)` days |
-| Sum of squared widths (SSW) | `r ssw` |
-| Cross-site spread | `r max(final_sub$prediction) - min(final_sub$prediction)` days |
-| Blend method | Averaged R + Python |
+| Backtest MAE | **4.23 days** |
+| R–Python agreement | `r round(avg_gap, 1)` days |
+| SSW (tiebreaker) | `r ssw` |
 
 :::
 ::: {.column width="45%"}
 
-```{r}
-#| fig-width: 5
-#| fig-height: 4.5
-final_sub |>
-  mutate(date_pred  = doy_to_date(target_year, prediction),
-         date_lower = doy_to_date(target_year, lower),
-         date_upper = doy_to_date(target_year, upper),
-         City = loc_names[location],
-         City = reorder(City, prediction)) |>
-  ggplot(aes(y = City)) +
-  geom_segment(aes(x = date_lower, xend = date_upper, yend = City),
-               linewidth = 5, color = "#F2A6B6", alpha = 0.7) +
-  geom_point(aes(x = date_pred), size = 5, color = "#C0392B") +
-  scale_x_date(date_labels = "%b %d") +
-  labs(title = "2026 Predicted Bloom Dates",
-       subtitle = "Red dot = point prediction, pink bar = 90% interval",
-       x = "Date", y = NULL) +
-  theme_minimal(base_size = 12) +
-  theme(panel.grid.major.y = element_blank())
-```
+**Interpretation:**
+
+- DC blooms earliest — Tidal Basin warmth
+- Kyoto & Liestal cluster in late March
+- NYC latest — continental cold delays spring
+- All within 8-day spread across sites
+- 90% intervals hold in backtest validation
 
 :::
 ::::
@@ -365,32 +338,18 @@ if (has_enh) {
 
 <br>
 
-**What the enhanced model adds:**
+**What adding temperature features does:**
 
-- GDD + chill hours → direct phenological drivers
-- ONI / NAO / PDO → macro-climate variability
-- Hopkins index + photoperiod → bioclimatic baselines
-- Deeper trees (depth 4) capture feature interactions
-- Stochastic boosting reduces overfitting
+- Directly models the winter → spring warming that triggers bloom
+- Better calibration of spring warmth accumulation
+- Tighter prediction intervals (avg 12.2 d vs 15.4 d baseline)
 
 :::
 ::: {.column width="45%"}
 
-**Why enhanced predictions are later:**
-
-- Better calibration of spring warming accumulation
-- Chill-hour accounting prevents premature bloom calls
-- Climate indices correctly dampen warm-bias years
-
-**Tighter intervals (12.2 d avg vs 15.4 d baseline):**
-
-- More features → lower residual variance
-- Better site-specific interval calibration
-- Exception: Vancouver (25 d) — only 4 years of data
-
 ```{r}
 #| fig-width: 4.5
-#| fig-height: 3
+#| fig-height: 3.5
 if (has_enh) {
   bind_rows(
     final_sub |> mutate(Model="Baseline", width=upper-lower),
@@ -399,12 +358,16 @@ if (has_enh) {
     mutate(City = loc_names[location]) |>
     ggplot(aes(City, width, fill=Model)) +
     geom_col(position="dodge", alpha=0.8) +
-    labs(title="Interval Width: Baseline vs Enhanced", y="Width (days)", x=NULL) +
+    labs(title="Interval Width Comparison", y="Width (days)", x=NULL) +
     theme_minimal(base_size=10) +
     scale_fill_manual(values=c(Baseline="#F2A6B6", Enhanced="#8B2252")) +
     theme(axis.text.x = element_text(angle=30, hjust=1))
 }
 ```
+
+**25% lower MAE** (4.23 vs 5.61 days)
+
+Vancouver remains widest (25 d) due to only 4 years of data.
 
 :::
 ::::
@@ -421,12 +384,4 @@ Cherry Blossom Peak Bloom Prediction 2026
 
 <br>
 
-Code, data, and outputs: [github.com/GMU-CherryBlossomCompetition](https://github.com/GMU-CherryBlossomCompetition/peak-bloom-prediction)
-
-[Interactive dashboard](dashboard.html)
-
-```bash
-quarto render solution.qmd                           # R pipeline
-python Solution_Enhanced_v2.py                        # Enhanced Python
-quarto render dashboard.qmd                           # Dashboard
-```
+[Interactive dashboard](dashboard.html) · [GitHub repo](https://github.com/GMU-CherryBlossomCompetition/peak-bloom-prediction)
